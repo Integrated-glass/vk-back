@@ -1,6 +1,6 @@
 from app import crud
 from app.core import config
-from app.models.user import UserCreate
+from app.models.organizer import OrganizerCreate
 
 # make sure all SQL Alchemy models are imported before initializing DB
 # otherwise, SQL Alchemy might fail to initialize properly relationships
@@ -16,7 +16,7 @@ def init_db(db_session):
 
     user = crud.user.get_by_email(db_session, email=config.FIRST_SUPERUSER)
     if not user:
-        user_in = UserCreate(
+        user_in = OrganizerCreate(
             email=config.FIRST_SUPERUSER,
             password=config.FIRST_SUPERUSER_PASSWORD,
             is_superuser=True,

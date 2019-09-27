@@ -10,9 +10,9 @@ from app.api.utils.security import get_current_user
 from app.core import config
 from app.core.jwt import create_access_token
 from app.core.security import get_password_hash
-from app.db_models.user import User as DBUser
+from app.db_models.organizer import Organizer as DBUser
 from app.models.token import Token
-from app.models.user import User
+from app.models.organizer import Organizer
 
 router = APIRouter()
 
@@ -40,7 +40,7 @@ def login_access_token(
     }
 
 
-@router.post("/login/test-token", tags=["login"], response_model=User)
+@router.post("/login/test-token", tags=["login"], response_model=Organizer)
 def test_token(current_user: DBUser = Depends(get_current_user)):
     """
     Test access token

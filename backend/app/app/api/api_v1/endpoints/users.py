@@ -9,13 +9,13 @@ from app import crud
 from app.api.utils.db import get_db
 from app.api.utils.security import get_current_active_superuser, get_current_active_user
 from app.core import config
-from app.db_models.user import User as DBUser
-from app.models.user import User, UserCreate, UserInDB, UserUpdate
+from app.db_models.organizer import Organizer as DBUser
+from app.models.organizer import Organizer, OrganizerCreate, OrganizerInDB, OrganizerUpdate
 
 router = APIRouter()
 
 
-@router.get("/", response_model=List[User])
+@router.get("/", response_model=List[Organizer])
 def read_users(
     db: Session = Depends(get_db),
     skip: int = 0,
@@ -29,11 +29,11 @@ def read_users(
     return users
 
 
-@router.post("/", response_model=User)
+@router.post("/", response_model=Organizer)
 def create_user(
     *,
     db: Session = Depends(get_db),
-    user_in: UserCreate,
+    user_in: OrganizerCreate,
     current_user: DBUser = Depends(get_current_active_superuser),
 ):
     """
@@ -49,7 +49,7 @@ def create_user(
     return user
 
 
-@router.put("/me", response_model=User)
+@router.put("/me", response_model=Organizer)
 def update_user_me(
     *,
     db: Session = Depends(get_db),
@@ -62,7 +62,7 @@ def update_user_me(
     Update own user.
     """
     current_user_data = jsonable_encoder(current_user)
-    user_in = UserUpdate(**current_user_data)
+    user_in = OrganizerUpdate(**current_user_data)
     if password is not None:
         user_in.password = password
     if full_name is not None:
@@ -73,7 +73,7 @@ def update_user_me(
     return user
 
 
-@router.get("/me", response_model=User)
+@router.get("/me", response_model=Organizer)
 def read_user_me(
     db: Session = Depends(get_db),
     current_user: DBUser = Depends(get_current_active_user),
@@ -84,7 +84,7 @@ def read_user_me(
     return current_user
 
 
-@router.post("/open", response_model=User)
+@router.post("/open", response_model=Organizer)
 def create_user_open(
     *,
     db: Session = Depends(get_db),
@@ -106,12 +106,12 @@ def create_user_open(
             status_code=400,
             detail="The user with this username already exists in the system",
         )
-    user_in = UserCreate(password=password, email=email, full_name=full_name)
+    user_in = OrganizerCreate(password=password, email=email, full_name=full_name)
     user = crud.user.create(db, user_in=user_in)
     return user
 
 
-@router.get("/{user_id}", response_model=User)
+@router.get("/{user_id}", response_model=Organizer)
 def read_user_by_id(
     user_id: int,
     current_user: DBUser = Depends(get_current_active_user),
@@ -130,13 +130,13 @@ def read_user_by_id(
     return user
 
 
-@router.put("/{user_id}", response_model=User)
+@router.put("/{user_id}", response_model=Organizer)
 def update_user(
     *,
     db: Session = Depends(get_db),
     user_id: int,
-    user_in: UserUpdate,
-    current_user: UserInDB = Depends(get_current_active_superuser),
+    user_in: OrganizerUpdate,
+    current_user: OrganizerInDB = Depends(get_current_active_superuser),
 ):
     """
     Update a user.

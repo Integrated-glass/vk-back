@@ -3,33 +3,33 @@ from .base import Base
 
 
 # Shared properties
-class UserBase(Base):
+class OrganizerBase(Base):
     email: Optional[str] = None
     is_active: Optional[bool] = True
     is_superuser: Optional[bool] = False
     full_name: Optional[str] = None
 
 
-class UserBaseInDB(UserBase):
+class OrganizerBaseInDB(OrganizerBase):
     id: int = None
 
 
 # Properties to receive via API on creation
-class UserCreate(UserBaseInDB):
+class OrganizerCreate(OrganizerBaseInDB):
     email: str
     password: str
 
 
 # Properties to receive via API on update
-class UserUpdate(UserBaseInDB):
+class OrganizerUpdate(OrganizerBaseInDB):
     password: Optional[str] = None
 
 
 # Additional properties to return via API
-class User(UserBaseInDB):
+class Organizer(OrganizerBaseInDB):
     pass
 
 
 # Additional properties stored in DB
-class UserInDB(UserBaseInDB):
+class OrganizerInDB(OrganizerBaseInDB):
     hashed_password: str
