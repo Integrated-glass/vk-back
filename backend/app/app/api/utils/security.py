@@ -12,8 +12,8 @@ from app import crud
 from app.api.utils.db import get_db
 from app.core import config
 from app.core.jwt import ALGORITHM
-from app.db_models.organizer import Organizer
-from app.models.token import TokenPayload
+from app.db_models.models import Organizer
+from app.models.models import TokenPayload
 
 reusable_oauth2 = OAuth2PasswordBearer(
     tokenUrl="/api/login/access-token",

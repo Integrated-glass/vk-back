@@ -2,9 +2,9 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
 from app.api.utils.db import get_db
-from app.models.organizer import Organizer
+from app.models.models import Organizer
 from app.api.utils.security import get_current_user
-from app.models.organizer import OrganizerInDB
+from app.models.models import OrganizerInDB
 import app.crud
 
 import logging

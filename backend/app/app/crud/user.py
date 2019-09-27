@@ -4,8 +4,8 @@ from fastapi.encoders import jsonable_encoder
 from sqlalchemy.orm import Session
 
 from app.core.security import get_password_hash, verify_password
-from app.db_models.organizer import Organizer
-from app.models.organizer import OrganizerCreate, OrganizerUpdate
+from app.db_models.models import Organizer
+from app.models.models import OrganizerCreate, OrganizerUpdate
 
 
 def get(db_session: Session, *, user_id: int) -> Optional[Organizer]:

@@ -9,8 +9,8 @@ from app import crud
 from app.api.utils.db import get_db
 from app.api.utils.security import get_current_active_superuser, get_current_active_user
 from app.core import config
-from app.db_models.organizer import Organizer as DBUser
-from app.models.organizer import Organizer, OrganizerCreate, OrganizerInDB, OrganizerUpdate
+from app.db_models.models import Organizer as DBUser
+from app.models.models import Organizer, OrganizerCreate, OrganizerInDB, OrganizerUpdate
 
 router = APIRouter()
 

@@ -1,6 +1,6 @@
 from app import crud
 from app.core import config
-from app.models.organizer import OrganizerCreate
+from app.models.models import OrganizerCreate
 
 # make sure all SQL Alchemy models are imported before initializing DB
 # otherwise, SQL Alchemy might fail to initialize properly relationships

@@ -1,7 +1,14 @@
-from typing import Optional
-from .base import Base
+from pydantic import BaseModel
+from typing import Optional, List
 
 
+# Base
+class Base(BaseModel):
+    class Config:
+        orm_mode = True
+
+
+# Organizer
 # Shared properties
 class OrganizerBase(Base):
     email: Optional[str] = None
@@ -33,3 +40,14 @@ class Organizer(OrganizerBaseInDB):
 # Additional properties stored in DB
 class OrganizerInDB(OrganizerBaseInDB):
     hashed_password: str
+
+
+# Token
+class Token(Base):
+  access_token: str
+  token_type: str
+
+
+class TokenPayload(Base):
+  user_id: int = None
+
