@@ -1,4 +1,7 @@
-from sqlalchemy import Boolean, Column, Integer, String, ForeignKey, Table, Date, DECIMAL, Text, DateTime
+import enum
+
+from sqlalchemy import Boolean, Column, Integer, String, \
+    ForeignKey, Table, Date, DECIMAL, Text, DateTime, Enum, CheckConstraint
 from sqlalchemy.orm import relationship
 
 from app.db.base_class import Base
@@ -40,7 +43,7 @@ class Partner(Base):
     id = Column(Integer, primary_key=True)
     name = Column(String, unique=True, nullable=False)
     description = Column(Text, nullable=True)
-    phone = Column(String(length=10), nullable=True)
+    phone = Column(String(length=20), nullable=True)
     link = Column(String, nullable=False)
 
 
@@ -67,6 +70,44 @@ class Tag(Base):
     volunteers = relationship('Volunteer', secondary=volunteer_tag, back_populates="interests")
 
 
+class VolunteerLanguageAssociation(Base):
+    __tablename__ = 'volunteer_language_associations'
+
+    proficiency = Column(Integer, nullable=False)
+    proficiency_check = CheckConstraint('proficiency >= 1 AND proficiency <= 6')
+    volunteer_id = Column(Integer, ForeignKey('volunteers.id'), primary_key=True)
+    volunteer = relationship('Volunteer', back_populates="languages")
+
+    language_id = Column(Integer, ForeignKey('languages.id'), primary_key=True)
+    language = relationship("Language", back_populates='volunteers')
+
+
+class Language(Base):
+    __tablename__ = 'languages'
+
+    id = Column(Integer, primary_key=True)
+    name = Column(String, unique=True)
+
+    volunteers = relationship("VolunteerLanguageAssociation", back_populates='language')
+
+
+class FoodPreferences(enum.Enum):
+    vegetarian = "Vegetarian",
+    vegan = 'Vegan',
+    halal = 'Halal',
+    kosher = 'Kosher',
+    nut_allergy = 'Nut Allergy'
+
+
+class ClothSize(enum.Enum):
+    XS = 'XS'
+    S = "S"
+    M = "M"
+    L = "L"
+    XL = "XL"
+    XXL = "XXL"
+
+
 class Volunteer(Base):
     __tablename__ = 'volunteers'
     id = Column(Integer, primary_key=True)
@@ -75,10 +116,34 @@ class Volunteer(Base):
     name = Column(String, nullable=False)
     surname = Column(String, nullable=False)
     date_of_birth = Column(Date, nullable=True)
-    karma = Column(DECIMAL)
+    karma = Column(DECIMAL, default=0)
 
     interests = relationship('Tag', secondary=volunteer_tag, backref='volunteers')
+    # additional from presentation
+    email = Column(String, nullable=False, unique=True)
+    phone = Column(String(length=20))
+    work = Column(String)
+    food_preferences = Column(Enum(FoodPreferences), nullable=True)
+    volunteering_experience = Column(Text, nullable=True)
+    interested_in_projects = Column(Text, nullable=True)
+    children_work_experience = Column(Text, nullable=True)
+    expectations = Column(Text, nullable=True)
+    medical_contradictions = Column(Text, nullable=True)
+    cloth_size = Column(Enum(ClothSize), nullable=False)
 
+    languages = relationship("VolunteerLanguageAssociation", back_populates="volunteer")
+    known_by_id = Column(Integer, ForeignKey("information_sources.id"))
+    known_by = relationship("InformationSource", back_populates='volunteers')
+
+
+class InformationSource(Base):
+    __tablename__ = 'information_sources'
+
+    id = Column(Integer, primary_key=True)
+    name = Column(String, nullable=False)
+
+    volunteers = relationship("Volunteer", back_populates='known_by')
+    
 
 class Role(Base):
     id = Column(Integer, primary_key=True)
