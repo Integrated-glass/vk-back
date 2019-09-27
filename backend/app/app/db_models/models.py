@@ -185,6 +185,8 @@ class OrganizerEvent(Base):
     event_id = Column(Integer, ForeignKey("events.id"), nullable=False)
     event = relationship("Event", back_populates="organizers")
 
+    todos = relationship("TODO", back_populates="organizer_event")
+
 
 class Project(Base):
     __tablename__ = "projects"
@@ -208,3 +210,15 @@ class OrganizerProject(Base):
     project_id = Column(Integer, ForeignKey("projects.id"), nullable=False)
     project = relationship("Project", back_populates="organizers")
 
+
+class TODO(Base):
+    __tablename__ = 'todos'
+
+    id = Column(Integer, primary_key=True)
+    is_done = Column(Boolean, default=False)
+    name = Column(String, nullable=False)
+    description = Column(String, nullable=True)
+    deadline = Column(DateTime, nullable=True)
+
+    organizer_event_id = Column(Integer, ForeignKey('organizers_events.id'))
+    organizer_event = relationship("OrganizerEvent", back_populates='todos')
