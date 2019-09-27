@@ -1,7 +1,9 @@
 import enum
 
-from sqlalchemy import Boolean, Column, Integer, String, \
-    ForeignKey, Table, Date, DECIMAL, Text, DateTime, Enum, CheckConstraint
+from sqlalchemy import Table, Column, ForeignKey,\
+    Date, DECIMAL, Text, DateTime, Enum, Boolean,\
+    Integer, String, \
+    CheckConstraint
 from sqlalchemy.orm import relationship
 
 from app.db.base_class import Base
@@ -55,6 +57,9 @@ class QR_data(Base):
 
     id = Column(Integer, primary_key=True)
     salt = Column(String, nullable=False)
+
+    event_volunteer_id = Column(Integer, ForeignKey("events_volunteers.id"), nullable=False)
+    event_volunteer = relationship("EventVolunteer", back_populates="qr_data", use_list=False)
 
 
 volunteer_tag = Table(
@@ -140,6 +145,8 @@ class Volunteer(Base):
     known_by_id = Column(Integer, ForeignKey("information_sources.id"))
     known_by = relationship("InformationSource", back_populates='volunteers')
 
+    events = relationship("EventVolunteer", back_populates="volunteer")
+
 
 class InformationSource(Base):
     __tablename__ = 'information_sources'
@@ -157,6 +164,11 @@ class Role(Base):
     description = Column(String, nullable=False)
     name = Column(String, nullable=False)
 
+    max_people = Column(Integer, nullable=False)
+
+    event_id = Column(Integer, ForeignKey("events.id"), nullable=False)
+    event = relationship("Event", back_poulates="roles")
+
 
 class Event(Base):
     __tablename__ = "events"
@@ -172,6 +184,9 @@ class Event(Base):
     project = relationship("Project", back_populates="events")
 
     organizers = relationship("OrganizerEvent", back_populates="event")
+    volunteers = relationship("EventVolunteer", back_populates="event")
+
+    roles = relationship("Role", back_populates="event")
 
 
 class OrganizerEvent(Base):
@@ -209,6 +224,43 @@ class OrganizerProject(Base):
 
     project_id = Column(Integer, ForeignKey("projects.id"), nullable=False)
     project = relationship("Project", back_populates="organizers")
+
+
+class ParticipationStatus(enum.Enum):
+    APPROVED = "approved"
+    WAITING = "waiting"
+    KICKED = "kicked"
+    DECLINED = "declined"
+    PLANNED = "planned"
+
+
+class EventVolunteer(Base):
+    __tablename__ = "events_volunteers"
+
+    id = Column(Integer, primary_key=True)
+
+    event_id = Column(Integer, ForeignKey("events.id"), nullable=False)
+    event = relationship("Event", back_populates="volunteers")
+
+    volunteer_id = Column(Integer, ForeignKey("volunteers.id"), nullable=False)
+    volunteer = relationship("Volunteer", back_populates="events")
+
+    qr_data = relationship("QR_data", back_populates="event_volunteer", use_list=False)
+
+    karma_to_pay = Column(Integer, nullable=False)
+    need_paper_certificate = Column(Boolean, nullable=False)
+    motivation = Column(String, nullable=False)
+    comment = Column(String, nullable=True)
+    participation_status = Column(Enum(ParticipationStatus), nullable=False)
+
+    actual_role_id = Column(Integer, ForeignKey("roles.id"), nullable=True)
+    preferable_role1_id = Column(Integer, ForeignKey("roles.id"), nullable=True)
+    preferable_role2_id = Column(Integer, ForeignKey("roles.id"), nullable=True)
+    preferable_role3_id = Column(Integer, ForeignKey("roles.id"), nullable=True)
+    actual_role = relationship("Role", foreign_keys=[actual_role_id])
+    preferable_role1 = relationship("Role", foreign_keys=[preferable_role1_id])
+    preferable_role2 = relationship("Role", foreign_keys=[preferable_role2_id])
+    preferable_role3 = relationship("Role", foreign_keys=[preferable_role3_id])
 
 
 class TODO(Base):
