@@ -34,10 +34,10 @@ class Invite(Base):
     activated = Column(Boolean, default=False)
 
     invitor_id = Column(Integer, ForeignKey('organizers.id'), nullable=True)
-    invitor = relationship("Organizer", back_populates='invited_by')
+    invitor = relationship("Organizer", back_populates='invited_by', foreign_keys=[invitor_id])
 
     issued_by_id = Column(Integer, ForeignKey('organizers.id'), nullable=False)
-    issued_by = relationship('Organizer', back_populates='invites')
+    issued_by = relationship('Organizer', back_populates='invites', foreign_keys=[issued_by_id])
 
 
 class Partner(Base):
@@ -179,7 +179,7 @@ class OrganizerEvent(Base):
 
     id = Column(Integer, primary_key=True)
 
-    organizer_id = Column(Integer, ForeignKey("organizers.id"), nullable=False),
+    organizer_id = Column(Integer, ForeignKey("organizers.id"), nullable=False)
     organizer = relationship("Organizer", back_populates="events")
 
     event_id = Column(Integer, ForeignKey("events.id"), nullable=False)
@@ -202,8 +202,9 @@ class OrganizerProject(Base):
 
     id = Column(Integer, primary_key=True)
 
-    organizer_id = Column(Integer, ForeignKey("organizers.id"), nullable=False),
+    organizer_id = Column(Integer, ForeignKey("organizers.id"), nullable=False)
     organizer = relationship("Organizer", back_populates="events")
 
     project_id = Column(Integer, ForeignKey("projects.id"), nullable=False)
     project = relationship("Project", back_populates="organizers")
+
