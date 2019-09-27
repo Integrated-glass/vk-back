@@ -8,8 +8,7 @@ services:
       - "80:80"
     restart: always
     env_file:
-      - backend.env
-      - postgres.env
+      - .env
     depends_on:
       - db
     volumes:
@@ -23,7 +22,7 @@ services:
     volumes:
       - db-data:/var/lib/postgresql/data
     env_file:
-      - postgres.env
+      - .env
 
 
   adminer:
@@ -39,8 +38,6 @@ services:
     depends_on:
       - db
     restart: always
-    env_file:
-      - postgres.env
     environment:
       HASURA_GRAPHQL_DATABASE_URL: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db/${POSTGRES_DB}
       HASURA_GRAPHQL_ENABLE_CONSOLE: "true" # set to "false" to disable console
