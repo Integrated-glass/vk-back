@@ -59,7 +59,7 @@ class QR_data(Base):
     salt = Column(String, nullable=False)
 
     event_volunteer_id = Column(Integer, ForeignKey("events_volunteers.id"), nullable=False)
-    event_volunteer = relationship("EventVolunteer", back_populates="qr_data", use_list=False)
+    event_volunteer = relationship("EventVolunteer", back_populates="qr_data", uselist=False)
 
 
 volunteer_tag = Table(
@@ -167,7 +167,7 @@ class Role(Base):
     max_people = Column(Integer, nullable=False)
 
     event_id = Column(Integer, ForeignKey("events.id"), nullable=False)
-    event = relationship("Event", back_poulates="roles")
+    event = relationship("Event", back_populates="roles")
 
 
 class Event(Base):
@@ -245,7 +245,7 @@ class EventVolunteer(Base):
     volunteer_id = Column(Integer, ForeignKey("volunteers.id"), nullable=False)
     volunteer = relationship("Volunteer", back_populates="events")
 
-    qr_data = relationship("QR_data", back_populates="event_volunteer", use_list=False)
+    qr_data = relationship("QR_data", back_populates="event_volunteer", uselist=False)
 
     karma_to_pay = Column(Integer, nullable=False)
     need_paper_certificate = Column(Boolean, nullable=False)
