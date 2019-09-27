@@ -17,6 +17,7 @@ class Organizer(Base):
     surname = Column(String, nullable=False)
     bio = Column(Text, nullable=True)
     company = Column(String, nullable=False)
+    email = Column(String, nullable=False, unique=True)
     password_hash = Column(String, nullable=False)
 
     invited_by = relationship("Invite", uselist=False, back_populates="invitor")
@@ -179,6 +180,7 @@ class Event(Base):
     base_karma_to_pay = Column(Integer, nullable=False)
     start_datetime = Column(DateTime, nullable=False)
     end_datetime = Column(DateTime, nullable=False)
+    can_apply = Column(Boolean, nullable=False, default=True)
 
     project_id = Column(Integer, ForeignKey("projects.id"), nullable=True)
     project = relationship("Project", back_populates="events")
