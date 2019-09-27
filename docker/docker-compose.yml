@@ -2,7 +2,7 @@ version: '3.3'
 services:
   backend:
     build:
-      ./backend
+      context: ../backend
     command: /start-reload.sh
     ports:
       - "80:80"
@@ -13,11 +13,13 @@ services:
     depends_on:
       - db
     volumes:
-      - ./backend/app:/app
+      - ../backend/app:/app
 
   db:
     image: postgres
     restart: always
+    ports:
+      - "5432:5432"
     volumes:
       - db-data:/var/lib/postgresql/data
     env_file:

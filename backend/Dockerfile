@@ -14,8 +14,6 @@ COPY --from=builder /install /usr/local
 RUN apk --no-cache add libpq
 RUN apk add bash curl
 
-EXPOSE 8888
-
 COPY ./app /app
 WORKDIR /app/
 

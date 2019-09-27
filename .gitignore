@@ -197,3 +197,6 @@ dmypy.json
 
 # End of https://www.gitignore.io/api/pydev,python,pycharm+all
 
+
+# Venv
+.venv
