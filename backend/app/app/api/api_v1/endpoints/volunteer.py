@@ -56,5 +56,9 @@ def patch(
     else:
         volunteer = crud.volunteer.get_vk_id(db, login_id=volunteer_login.id)
         if volunteer is None:
-            volunteer = Volunteer(login_id=volunteer_login.id)
+            new_volunteer = Volunteer(login_id=volunteer_login.id)
+            db.add(new_volunteer)
+            db.commit()
+            db.refresh(new_volunteer)
+            return crud.volunteer.update(db, user=new_volunteer, user_in=update_data)
         return crud.volunteer.update(db, user=volunteer, user_in=update_data)

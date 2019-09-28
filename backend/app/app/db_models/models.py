@@ -344,11 +344,3 @@ class TODO(Base):
 
     organizer_event_id = Column(Integer, ForeignKey('organizers_events.id'))
     organizer_event = relationship("OrganizerEvent", back_populates='todos')
-
-
-class Association(Base):
-    __tablename__ = 'association'
-    left_id = Column(Integer, ForeignKey('left.id'), primary_key=True)
-    right_id = Column(Integer, ForeignKey('right.id'), primary_key=True)
-    extra_data = Column(String(50))
-    child = relationship("Child", back_populates="parents")
