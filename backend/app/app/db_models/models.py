@@ -1,7 +1,7 @@
 import enum
 
-from sqlalchemy import Table, Column, ForeignKey,\
-    Date, DECIMAL, Text, DateTime, Enum, Boolean,\
+from sqlalchemy import Table, Column, ForeignKey, \
+    Date, DECIMAL, Text, DateTime, Enum, Boolean, \
     Integer, String, \
     CheckConstraint
 from sqlalchemy.orm import relationship
@@ -17,10 +17,13 @@ class Organizer(Base):
     surname = Column(String, nullable=False)
     bio = Column(Text, nullable=True)
     company = Column(String, nullable=False)
+    position = Column(String, nullable=False)
+    social_link = Column(String, nullable=False)
+    phone_number = Column(String, nullable=False)
     email = Column(String, nullable=False, unique=True)
     password_hash = Column(String, nullable=False)
 
-    invited_by = relationship("Invite", uselist=False, back_populates="invitor")
+    # invited_by = relationship("Invite")  # , uselist=False, back_populates="invitee", foreign_keys='[invites.id]')
 
     invites = relationship("Invite", back_populates='issued_by')
 
@@ -34,10 +37,9 @@ class Invite(Base):
     id = Column(Integer, primary_key=True)
     issue_date = Column(DateTime, nullable=False)
     key = Column(String, nullable=False)
-    activated = Column(Boolean, default=False)
 
-    invitor_id = Column(Integer, ForeignKey('organizers.id'), nullable=True)
-    invitor = relationship("Organizer", back_populates='invited_by', foreign_keys=[invitor_id])
+    # invitee_id = Column(Integer, ForeignKey('organizers.id'), nullable=True)
+    # invitee = relationship("Organizer", back_populates='invited_by', foreign_keys=[invitee_id])
 
     issued_by_id = Column(Integer, ForeignKey('organizers.id'), nullable=False)
     issued_by = relationship('Organizer', back_populates='invites', foreign_keys=[issued_by_id])
@@ -121,30 +123,35 @@ class Volunteer(Base):
     __tablename__ = 'volunteers'
 
     id = Column(Integer, primary_key=True)
-    volunteer_id = Column(String, nullable=False, unique=True)
-    vk_id = Column(Integer, nullable=False, unique=True)
-    name = Column(String, nullable=False)
-    surname = Column(String, nullable=False)
-    date_of_birth = Column(Date, nullable=True)
+    volunteer_id = Column(String, nullable=False, unique=True) #
+    vk_id = Column(Integer, nullable=False, unique=True) #
+    name = Column(String, nullable=False) #
+    surname = Column(String, nullable=False) #
+    date_of_birth = Column(Date, nullable=True) #
     karma = Column(DECIMAL, default=0)
 
     interests = relationship('Tag', secondary=volunteer_tag, back_populates='volunteers')
     # additional from presentation
-    email = Column(String, nullable=False, unique=True)
-    phone = Column(String(length=20))
-    work = Column(String)
-    food_preferences = Column(Enum(FoodPreferences), nullable=True)
-    volunteering_experience = Column(Text, nullable=True)
-    interested_in_projects = Column(Text, nullable=True)
-    children_work_experience = Column(Text, nullable=True)
-    expectations = Column(Text, nullable=True)
-    medical_contradictions = Column(Text, nullable=True)
-    cloth_size = Column(Enum(ClothSize), nullable=False)
-    accept_news = Column(Boolean, nullable=False)
+    email = Column(String, nullable=False, unique=True) #
+    phone = Column(String(length=20)) #
+    work = Column(String) #
+    # специальность по диплому
+    food_preferences = Column(Enum(FoodPreferences), nullable=True) ###
+    volunteering_experience = Column(Text, nullable=True) #
+    interested_in_projects = Column(Text, nullable=True) ## *
+    children_work_experience = Column(Text, nullable=True) ## *
+    ## additional skills *
+    ## why to work with us *
+    expectations = Column(Text, nullable=True) ##
+    medical_contradictions = Column(Text, nullable=True) ###
+    cloth_size = Column(Enum(ClothSize), nullable=False) ### *
+    accept_news = Column(Boolean, nullable=False) ##
 
-    languages = relationship("VolunteerLanguageAssociation", back_populates="volunteer")
+    ### save photo
+
+    languages = relationship("VolunteerLanguageAssociation", back_populates="volunteer") #
     known_by_id = Column(Integer, ForeignKey("information_sources.id"))
-    known_by = relationship("InformationSource", back_populates='volunteers')
+    known_by = relationship("InformationSource", back_populates='volunteers') ## *
 
     events = relationship("EventVolunteer", back_populates="volunteer")
 
@@ -222,7 +229,7 @@ class OrganizerProject(Base):
     id = Column(Integer, primary_key=True)
 
     organizer_id = Column(Integer, ForeignKey("organizers.id"), nullable=False)
-    organizer = relationship("Organizer", back_populates="events")
+    organizer = relationship("Organizer", back_populates="projects")
 
     project_id = Column(Integer, ForeignKey("projects.id"), nullable=False)
     project = relationship("Project", back_populates="organizers")

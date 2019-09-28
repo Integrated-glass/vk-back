@@ -31,21 +31,21 @@ def get_current_user(
         raise HTTPException(
             status_code=HTTP_403_FORBIDDEN, detail="Could not validate credentials"
         )
-    user = crud.user.get(db, user_id=token_data.user_id)
+    user = crud.organizer.get(db, user_id=token_data.user_id)
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
     return user
 
 
-def get_current_active_user(current_user: Organizer = Security(get_current_user)):
-    if not crud.user.is_active(current_user):
-        raise HTTPException(status_code=400, detail="Inactive user")
-    return current_user
-
-
-def get_current_active_superuser(current_user: Organizer = Security(get_current_user)):
-    if not crud.user.is_superuser(current_user):
-        raise HTTPException(
-            status_code=400, detail="The user doesn't have enough privileges"
-        )
-    return current_user
+# def get_current_active_user(current_user: Organizer = Security(get_current_user)):
+#     if not crud.organizer.is_active(current_user):
+#         raise HTTPException(status_code=400, detail="Inactive user")
+#     return current_user
+#
+#
+# def get_current_active_superuser(current_user: Organizer = Security(get_current_user)):
+#     if not crud.organizer.is_superuser(current_user):
+#         raise HTTPException(
+#             status_code=400, detail="The user doesn't have enough privileges"
+#         )
+#     return current_user

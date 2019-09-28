@@ -20,17 +20,9 @@ def authenticate(db_session: Session, *, email: str, password: str) -> Optional[
     user = get_by_email(db_session, email=email)
     if not user:
         return None
-    if not verify_password(password, user.hashed_password):
+    if not verify_password(password, user.password_hash):
         return None
     return user
-
-
-def is_active(user) -> bool:
-    return user.is_active
-
-
-def is_superuser(user) -> bool:
-    return user.is_superuser
 
 
 def get_multi(db_session: Session, *, skip=0, limit=100) -> List[Optional[Organizer]]:
@@ -38,11 +30,11 @@ def get_multi(db_session: Session, *, skip=0, limit=100) -> List[Optional[Organi
 
 
 def create(db_session: Session, *, user_in: OrganizerCreate) -> Organizer:
+    data = dict(user_in)
+    data['password_hash'] = get_password_hash(data['password'])
+    del data['password']
     user = Organizer(
-        email=user_in.email,
-        hashed_password=get_password_hash(user_in.password),
-        full_name=user_in.full_name,
-        is_superuser=user_in.is_superuser,
+        **data
     )
     db_session.add(user)
     db_session.commit()

@@ -1,5 +1,8 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, EmailStr, UrlStr, constr
+from datetime import date
 from typing import Optional, List
+
+PhoneNumber = constr(regex='^\+\d-\d{3}-\d{3}-\d{2}-\d{2}$')
 
 
 # Base
@@ -14,7 +17,8 @@ class OrganizerBase(Base):
     email: Optional[str] = None
     is_active: Optional[bool] = True
     is_superuser: Optional[bool] = False
-    full_name: Optional[str] = None
+    name: str
+    surname: str
 
 
 class OrganizerBaseInDB(OrganizerBase):
@@ -22,9 +26,15 @@ class OrganizerBaseInDB(OrganizerBase):
 
 
 # Properties to receive via API on creation
-class OrganizerCreate(OrganizerBaseInDB):
-    email: str
+class OrganizerCreate(Base):
+    name: str
+    surname: str
+    email: EmailStr
     password: str
+    company: str
+    phone_number: PhoneNumber
+    social_link: UrlStr
+    position: str
 
 
 # Properties to receive via API on update
@@ -33,8 +43,15 @@ class OrganizerUpdate(OrganizerBaseInDB):
 
 
 # Additional properties to return via API
-class Organizer(OrganizerBaseInDB):
-    pass
+class Organizer(Base):
+    id: int
+    name: str
+    surname: str
+    email: EmailStr
+    company: str
+    phone_number: PhoneNumber
+    social_link: UrlStr
+    position: str
 
 
 # Additional properties stored in DB
@@ -44,10 +61,9 @@ class OrganizerInDB(OrganizerBaseInDB):
 
 # Token
 class Token(Base):
-  access_token: str
-  token_type: str
+    access_token: str
+    token_type: str
 
 
 class TokenPayload(Base):
-  user_id: int = None
-
+    user_id: int = None
