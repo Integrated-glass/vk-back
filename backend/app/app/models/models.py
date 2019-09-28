@@ -56,8 +56,14 @@ class Organizer(Base):
 
 
 # Additional properties stored in DB
-class OrganizerInDB(OrganizerBaseInDB):
-    hashed_password: str
+class OrganizerInDB(Base):
+    name: str
+    surname: str
+    email: EmailStr
+    company: str
+    phone_number: PhoneStr
+    social_link: UrlStr
+    position: str
 
 
 # Token
@@ -83,32 +89,29 @@ class VolunteerFormResponse(VolunteerForm):
     login_id: int
 
 
-class VolunteerForm1(Base):
-    vk_id: int
-    volunteer_id: str
-    name: str
-    surname: str
-    date_of_birth: date
-    email: EmailStr
-    phone_number: PhoneStr
-    volunteering_experience: str
-    speciality: str
-    languages: List[int]
-
-
-class VolunteerForm2(Base):
-    vk_id: int
-    interested_in_projects: str
-    children_work_experience: str
-    additional_skills: str
-    reasons_to_work: str
+class VolunteerPatch(Base):
+    login_id: int
+    volunteer_id: Optional[str]
+    email: Optional[EmailStr]
+    phone_number: Optional[PhoneStr]
+    volunteering_experience: Optional[str]
+    speciality: Optional[str]
+    languages: Optional[List[int]]
+    interested_in_projects: Optional[str]
+    children_work_experience: Optional[str]
+    additional_skills: Optional[str]
+    reasons_to_work: Optional[str]
     expectations: Optional[str]
-    accept_news: Optional[bool] = True
-    known_by_id: int
-
-
-class VolunteerForm3(Base):
-    vk_id: int
+    accept_news: Optional[bool]
+    known_by_id: Optional[int]
     food_preferences: Optional[FoodPreferences]
     medical_contradictions: Optional[str]
-    cloth_size: ClothSize
+    cloth_size: Optional[ClothSize]
+
+
+# Partner
+class PartnerCreate(Base):
+    name: str
+    description: Optional[str]
+    phone_number: Optional[PhoneStr]
+    link: UrlStr

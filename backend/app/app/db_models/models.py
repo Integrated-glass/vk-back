@@ -56,8 +56,10 @@ class Partner(Base):
     id = Column(Integer, primary_key=True)
     name = Column(String, unique=True, nullable=False)
     description = Column(Text, nullable=True)
-    phone = Column(String(length=20), nullable=True)
+    phone_number = Column(String, nullable=True)
     link = Column(String, nullable=False)
+
+    events = relationship("EventPartnerAssociation", back_populates="partner")
 
 
 class QR_data(Base):
@@ -141,30 +143,26 @@ class Volunteer(Base):
     __tablename__ = 'volunteers'
 
     id = Column(Integer, primary_key=True)
-    volunteer_id = Column(String, nullable=False, unique=True)  #
-    # vk_id = Column(Integer, nullable=False, unique=True) #
-    # name = Column(String, nullable=False) #
-    # surname = Column(String, nullable=False) #
-    # date_of_birth = Column(Date, nullable=True) #
+    volunteer_id = Column(String, nullable=True, unique=True)  #
 
     karma = Column(Integer, server_default="50")
 
     interests = relationship('Tag', secondary=volunteer_tag, back_populates='volunteers')
     # additional from presentation
-    email = Column(String, nullable=False, unique=True)  #
-    phone_number = Column(String(length=20), nullable=False)  #
-    phone_number_constraint = CheckConstraint(f"phone_number ~* {phone_number_regex}")
-    work = Column(String, nullable=False)  #
+    email = Column(String, nullable=True, unique=True)  #
+    phone_number = Column(String(length=20), nullable=True)  #
+    # phone_number_constraint = CheckConstraint(f"phone_number ~* {phone_number_regex}")
+    work = Column(String, nullable=True)  #
     speciality = Column(String, nullable=True)  #
     food_preferences = Column(Enum(FoodPreferences), nullable=True)  ###
     volunteering_experience = Column(Text, nullable=True)  #
-    interested_in_projects = Column(Text, nullable=False)  ## *
-    children_work_experience = Column(Text, nullable=False)  ## *
-    additional_skills = Column(String, nullable=False)  ## *
-    reasons_to_work = Column(String, nullable=False)  ## *
+    interested_in_projects = Column(Text, nullable=True)  ## *
+    children_work_experience = Column(Text, nullable=True)  ## *
+    additional_skills = Column(String, nullable=True)  ## *
+    reasons_to_work = Column(String, nullable=True)  ## *
     expectations = Column(Text, nullable=True)  ##
     medical_contradictions = Column(Text, nullable=True)  ###
-    cloth_size = Column(Enum(ClothSize), nullable=False)  ### *
+    cloth_size = Column(Enum(ClothSize), nullable=True)  ### *
     accept_news = Column(Boolean, ColumnDefault(True), server_default='t')  ##
 
     ### save photo
@@ -173,7 +171,7 @@ class Volunteer(Base):
     login = relationship("VolunteerLogin", back_populates="volunteer")
 
     languages = relationship("VolunteerLanguageAssociation", back_populates="volunteer")  #
-    known_by_id = Column(Integer, ForeignKey("information_sources.id"), nullable=False)
+    known_by_id = Column(Integer, ForeignKey("information_sources.id"), nullable=True)
     known_by = relationship("InformationSource", back_populates='volunteers')  ## *
 
     events = relationship("EventVolunteer", back_populates="volunteer")
@@ -201,6 +199,16 @@ class Role(Base):
     event = relationship("Event", back_populates="roles")
 
 
+class EventPartnerAssociation(Base):
+    __tablename__ = 'event_partner_associations'
+
+    event_id = Column(Integer, ForeignKey('events.id'), primary_key=True)
+    partner_id = Column(Integer, ForeignKey('partners.id'), primary_key=True)
+
+    partner = relationship("Partner", back_populates='events')
+    event = relationship("Event", back_populates="partners")
+
+
 class Event(Base):
     __tablename__ = "events"
 
@@ -216,6 +224,7 @@ class Event(Base):
 
     organizers = relationship("OrganizerEvent", back_populates="event")
     volunteers = relationship("EventVolunteer", back_populates="event")
+    partners = relationship("EventPartnerAssociation", back_populates="event")
 
     @staticmethod
     def calculate_default_karma(context: DefaultExecutionContext):
@@ -335,3 +344,11 @@ class TODO(Base):
 
     organizer_event_id = Column(Integer, ForeignKey('organizers_events.id'))
     organizer_event = relationship("OrganizerEvent", back_populates='todos')
+
+
+class Association(Base):
+    __tablename__ = 'association'
+    left_id = Column(Integer, ForeignKey('left.id'), primary_key=True)
+    right_id = Column(Integer, ForeignKey('right.id'), primary_key=True)
+    extra_data = Column(String(50))
+    child = relationship("Child", back_populates="parents")
