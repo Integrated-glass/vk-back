@@ -30,16 +30,21 @@ def form_step_0(
             "surname": data.surname,
             "date_of_birth": data.date_of_birth,
             "photo": data.photo,
-            "login_id": data.id
+            "login_id": data.id,
+            "email": None,
+            "phone_number": None
         }
     else:
+        volunteer = user.volunteer
         return {
             "vk_id": user.vk_id,
             "name": user.name,
             "surname": user.surname,
             "date_of_birth": user.date_of_birth,
             "photo": user.photo,
-            "login_id": user.id
+            "login_id": user.id,
+            "email": getattr(volunteer, "email", None),
+            "phone_number": getattr(volunteer, "phone_number", None)
         }
 
 

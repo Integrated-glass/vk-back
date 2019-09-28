@@ -87,6 +87,8 @@ class VolunteerForm(Base):
 
 class VolunteerFormResponse(VolunteerForm):
     login_id: int
+    email: Optional[str]
+    phone_number: Optional[str]
 
 
 class VolunteerPatch(Base):
