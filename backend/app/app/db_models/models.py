@@ -134,26 +134,26 @@ class Volunteer(Base):
 
     interests = relationship('Tag', secondary=volunteer_tag, back_populates='volunteers')
     # additional from presentation
-    email = Column(String, nullable=False, unique=True) #
-    phone = Column(String(length=20)) #
-    work = Column(String) #
-    # специальность по диплому
-    food_preferences = Column(Enum(FoodPreferences), nullable=True) ###
-    volunteering_experience = Column(Text, nullable=True) #
-    interested_in_projects = Column(Text, nullable=True) ## *
-    children_work_experience = Column(Text, nullable=True) ## *
-    ## additional skills *
-    ## why to work with us *
-    expectations = Column(Text, nullable=True) ##
-    medical_contradictions = Column(Text, nullable=True) ###
-    cloth_size = Column(Enum(ClothSize), nullable=False) ### *
-    accept_news = Column(Boolean, nullable=False) ##
+    email = Column(String, nullable=False, unique=True)  #
+    phone = Column(String(length=20))  #
+    work = Column(String)  #
+    speciality = Column(String, nullable=True)  #
+    food_preferences = Column(Enum(FoodPreferences), nullable=True)  ###
+    volunteering_experience = Column(Text, nullable=True)  #
+    interested_in_projects = Column(Text, nullable=True)  ## *
+    children_work_experience = Column(Text, nullable=True)  ## *
+    additional_skills = Column(String, nullable=True) ## *
+    reasons_to_work = Column(String, nullable=True) ## *
+    expectations = Column(Text, nullable=True)  ##
+    medical_contradictions = Column(Text, nullable=True)  ###
+    cloth_size = Column(Enum(ClothSize), nullable=True)  ### *
+    accept_news = Column(Boolean, ColumnDefault(True), server_default='t')  ##
 
     ### save photo
 
-    languages = relationship("VolunteerLanguageAssociation", back_populates="volunteer") #
+    languages = relationship("VolunteerLanguageAssociation", back_populates="volunteer")  #
     known_by_id = Column(Integer, ForeignKey("information_sources.id"))
-    known_by = relationship("InformationSource", back_populates='volunteers') ## *
+    known_by = relationship("InformationSource", back_populates='volunteers')  ## *
 
     events = relationship("EventVolunteer", back_populates="volunteer")
 
