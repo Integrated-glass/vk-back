@@ -8,11 +8,15 @@ from app.models.models import VolunteerForm
 
 def create(db_session: Session, *, user_in: VolunteerForm) -> VolunteerLogin:
     data = dict(user_in)
-    data['date_of_birth'] = f"{data['date_of_birth']}.{MINYEAR}"
     user = VolunteerLogin(
         **data
     )
     db_session.add(user)
     db_session.commit()
     db_session.refresh(user)
+    return user
+
+
+def get(db_session: Session, *, user_in: VolunteerForm) -> VolunteerLogin:
+    user = db_session.query(VolunteerLogin).filter(VolunteerLogin.vk_id == user_in.vk_id).one_or_none()
     return user

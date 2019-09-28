@@ -75,7 +75,7 @@ class VolunteerForm(Base):
     vk_id: int
     name: str
     surname: str
-    date_of_birth: date
+    date_of_birth: Optional[date]
     photo: UrlStr
 
 

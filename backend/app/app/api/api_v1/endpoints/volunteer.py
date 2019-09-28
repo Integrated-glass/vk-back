@@ -21,12 +21,23 @@ def form_step_0(
         db: Session = Depends(get_db),
         data: VolunteerForm
 ):
-    data = crud.volunteer.create(db, user_in=data)
-    return {
-        "vk_id": data.vk_id,
-        "name": data.name,
-        "surname": data.surname,
-        "date_of_birth": data.date_of_birth,
-        "photo": data.photo,
-        "login_id": data.id
-    }
+    user = crud.volunteer.get(db, user_in=data)
+    if user is None:
+        data = crud.volunteer.create(db, user_in=data)
+        return {
+            "vk_id": data.vk_id,
+            "name": data.name,
+            "surname": data.surname,
+            "date_of_birth": data.date_of_birth,
+            "photo": data.photo,
+            "login_id": data.id
+        }
+    else:
+        return {
+            "vk_id": user.vk_id,
+            "name": user.name,
+            "surname": user.surname,
+            "date_of_birth": user.date_of_birth,
+            "photo": user.photo,
+            "login_id": user.id
+        }
