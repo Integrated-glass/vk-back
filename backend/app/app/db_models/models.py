@@ -319,17 +319,17 @@ class EventVolunteer(Base):
 
     qr_data = relationship("QR_data", back_populates="event_volunteer", uselist=False)
 
-    karma_to_pay = Column(Integer, nullable=False)
-    need_paper_certificate = Column(Boolean, nullable=False)
+    karma_to_pay = Column(Integer, nullable=False, server_default='0', default=0)
+    need_paper_certificate = Column(Boolean, nullable=False, server_default='f')
     motivation = Column(String, nullable=False)
     comment = Column(String, nullable=True)
     participation_status = Column(Enum(ParticipationStatus), nullable=False)
 
     actual_role_id = Column(Integer, ForeignKey("roles.id"), nullable=True)
+    actual_role = relationship("Role", foreign_keys=[actual_role_id])
     preferable_role1_id = Column(Integer, ForeignKey("roles.id"), nullable=True)
     preferable_role2_id = Column(Integer, ForeignKey("roles.id"), nullable=True)
     preferable_role3_id = Column(Integer, ForeignKey("roles.id"), nullable=True)
-    actual_role = relationship("Role", foreign_keys=[actual_role_id])
     preferable_role1 = relationship("Role", foreign_keys=[preferable_role1_id])
     preferable_role2 = relationship("Role", foreign_keys=[preferable_role2_id])
     preferable_role3 = relationship("Role", foreign_keys=[preferable_role3_id])

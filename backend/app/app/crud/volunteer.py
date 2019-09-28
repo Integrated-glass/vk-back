@@ -1,8 +1,9 @@
 from typing import List, Optional
 from fastapi.encoders import jsonable_encoder
 from sqlalchemy.orm import Session
-from app.db_models.models import VolunteerLogin, Volunteer
-from app.models.models import VolunteerForm, VolunteerPatch
+from app.db_models.models import VolunteerLogin, Volunteer, EventVolunteer, ParticipationStatus, Event, Role
+from app.models.models import VolunteerForm, VolunteerPatch, EventApplication
+from app.api.utils.list import get_from_list_or_default
 
 
 def create(db_session: Session, *, user_in: VolunteerForm) -> VolunteerLogin:
@@ -46,7 +47,30 @@ def update(db_session: Session, *, user: Volunteer, user_in: VolunteerPatch):
 
 
 def get_by_id(db_session: Session, volunteer_id: int) -> Volunteer:
-    return db_session\
-        .query(Volunteer)\
-        .filter(Volunteer.id == volunteer_id)\
+    return db_session \
+        .query(Volunteer) \
+        .filter(Volunteer.id == volunteer_id) \
         .one_or_none()
+
+
+
+def apply(db_session: Session, application: EventApplication, volunteer: Volunteer,
+          event: Event, roles_can_apply: List[Role]):
+    roles_can_apply = list(map(lambda x: getattr(x, "id", None), roles_can_apply))
+    event_application = EventVolunteer(
+        event_id=application.event_id,
+        volunteer_id=volunteer.id,
+        karma_to_pay=event.base_karma_to_pay,
+        need_paper_certificate=application.need_paper_certificate,
+        motivation=application.motivation,
+        participation_status=ParticipationStatus.WAITING,
+        comment=application.comment,
+        actual_role_id=None,
+        preferable_role1_id=get_from_list_or_default(roles_can_apply, 0),
+        preferable_role2_id=get_from_list_or_default(roles_can_apply, 1),
+        preferable_role3_id=get_from_list_or_default(roles_can_apply, 2),
+    )
+
+    db_session.add(event_application)
+    db_session.commit()
+    db_session.refresh(event_application)

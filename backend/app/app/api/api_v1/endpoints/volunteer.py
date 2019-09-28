@@ -1,16 +1,21 @@
 from typing import List
+from datetime import date, datetime
 
 from fastapi import APIRouter, Body, Depends, HTTPException
 from fastapi.encoders import jsonable_encoder
 from pydantic.types import EmailStr
+from sqlalchemy import func, and_, or_
 from sqlalchemy.orm import Session
+from starlette.status import HTTP_404_NOT_FOUND, HTTP_401_UNAUTHORIZED, \
+    HTTP_403_FORBIDDEN, HTTP_412_PRECONDITION_FAILED, HTTP_422_UNPROCESSABLE_ENTITY
 
 from app import crud
 from app.api.utils.db import get_db
 from app.core import config
 from app.api.utils.security import get_current_user
-from app.db_models.models import Volunteer
-from app.models.models import VolunteerForm, VolunteerFormResponse, VolunteerPatch
+from app.db_models.models import Volunteer, VolunteerLogin, Event, EventVolunteer, ParticipationStatus, Role
+from app.models.models import VolunteerForm, VolunteerFormResponse, \
+    VolunteerPatch, EventApplication, OkResponse
 
 router = APIRouter()
 
@@ -57,7 +62,7 @@ def patch(
 ):
     volunteer_login = crud.volunteer.get_login_vk_id(db, vk_id=vk_id)
     if volunteer_login is None:
-        raise HTTPException(status_code=404, detail="No login information for given volunteer found")
+        raise HTTPException(status_code=HTTP_404_NOT_FOUND, detail="No login information for given volunteer found")
     else:
         volunteer = crud.volunteer.get_vk_id(db, login_id=volunteer_login.id)
         if volunteer is None:
@@ -67,3 +72,63 @@ def patch(
             db.refresh(new_volunteer)
             return crud.volunteer.update(db, user=new_volunteer, user_in=update_data)
         return crud.volunteer.update(db, user=volunteer, user_in=update_data)
+
+
+@router.post("/apply", response_model=OkResponse)
+def apply_to_event(
+        db: Session = Depends(get_db),
+        *,
+        application: EventApplication
+):
+    event = db.query(Event).filter(Event.id == application.event_id).first()  # type: Event
+    if event is None:
+        raise HTTPException(status_code=HTTP_422_UNPROCESSABLE_ENTITY,
+                            detail="Мероприятие с данным id не существуем"
+                            )
+    if event.start_datetime < datetime.today():
+        raise HTTPException(status_code=HTTP_422_UNPROCESSABLE_ENTITY,
+                            detail="Мероприятие уже началось"
+                            )
+    if not event.can_apply:
+        raise HTTPException(status_code=HTTP_422_UNPROCESSABLE_ENTITY,
+                            detail="Регистрация на данное мероприятие закрыта"
+                            )
+    volunteer_login = db.query(VolunteerLogin).filter(
+        VolunteerLogin.vk_id == application.vk_id).first()  # type:VolunteerLogin
+    if volunteer_login is None:
+        raise HTTPException(status_code=HTTP_422_UNPROCESSABLE_ENTITY,
+                            detail="Вы не авторизировались"
+                            )
+    volunteer = volunteer_login.volunteer  # type: Volunteer
+    roles_can_apply = []
+    asked_roles = db.query(Role).filter(or_(Role.id == application.preferable_role1_id,
+                                            Role.id == application.preferable_role2_id,
+                                            Role.id == application.preferable_role3_id)).all()
+    for role in asked_roles:
+        if role.event_id != event.id:
+            raise HTTPException(status_code=HTTP_422_UNPROCESSABLE_ENTITY,
+                                detail=f"Роль {role.name} не принадлежит мероприятию {event.name}"
+                                )
+        if role.age_restriction > 0:
+            if volunteer_login.date_of_birth is None:
+                raise HTTPException(status_code=HTTP_422_UNPROCESSABLE_ENTITY,
+                                    detail="Вы не указали дату рождения")
+            else:
+                # TODO check it
+                if (date.today() - volunteer_login.date_of_birth).days > event.age_restriction * 365:
+                    roles_can_apply.append(role)
+        elif role.max_people <= db.query(func.count(event.volunteers)).filter(and_(EventVolunteer.actual_role == role,
+                                                                                   EventVolunteer.participation_status == ParticipationStatus.APPROVED)).scalar():
+            pass
+        else:
+            roles_can_apply.append(role)
+    if len(roles_can_apply) == 0:
+        raise HTTPException(status_code=HTTP_422_UNPROCESSABLE_ENTITY,
+                            detail="Нет свободных мест или вы не подходите по возрасту к выбранным ролям")
+    if db.query(EventVolunteer).filter(and_(EventVolunteer.volunteer_id == volunteer.id,
+                                            EventVolunteer.event_id == event.id)).first() is not None:
+        raise HTTPException(status_code=HTTP_422_UNPROCESSABLE_ENTITY,
+                            detail="Вы уже подавали заявку на участие в данном мероприятии")
+    crud.volunteer.apply(db, application=application, volunteer=volunteer, event=event, roles_can_apply=roles_can_apply)
+
+    return OkResponse()

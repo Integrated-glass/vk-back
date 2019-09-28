@@ -1,4 +1,4 @@
-from pydantic import BaseModel, EmailStr, UrlStr, constr
+from pydantic import BaseModel, EmailStr, UrlStr, constr, PositiveInt
 from datetime import date
 from typing import Optional, List
 from app.db_models.models import FoodPreferences, ClothSize, phone_number_regex
@@ -45,7 +45,7 @@ class OrganizerUpdate(OrganizerBaseInDB):
 
 # Additional properties to return via API
 class Organizer(Base):
-    id: int
+    id: PositiveInt
     name: str
     surname: str
     email: EmailStr
@@ -73,12 +73,12 @@ class Token(Base):
 
 
 class TokenPayload(Base):
-    user_id: int = None
+    user_id: PositiveInt = None
 
 
 # Volunteer
 class VolunteerForm(Base):
-    vk_id: int
+    vk_id: PositiveInt
     name: str
     surname: str
     date_of_birth: Optional[date]
@@ -86,7 +86,7 @@ class VolunteerForm(Base):
 
 
 class VolunteerFormResponse(VolunteerForm):
-    login_id: int
+    login_id: PositiveInt
     email: Optional[str]
     phone_number: Optional[str]
 
@@ -111,24 +111,17 @@ class VolunteerPatch(Base):
     cloth_size: Optional[str]
 
 
-# class VolunteerPatch(Base):
-#     login_id: int
-#     volunteer_id: Optional[str]
-#     email: Optional[EmailStr]
-#     phone_number: Optional[PhoneStr]
-#     volunteering_experience: Optional[str]
-#     speciality: Optional[str]
-#     languages: Optional[List[int]]
-#     interested_in_projects: Optional[str]
-#     children_work_experience: Optional[str]
-#     additional_skills: Optional[str]
-#     reasons_to_work: Optional[str]
-#     expectations: Optional[str]
-#     accept_news: Optional[bool]
-#     known_by_id: Optional[int]
-#     food_preferences: FoodPreferences = None
-#     medical_contradictions: Optional[str]
-#     cloth_size: ClothSize = None
+# EventApplication
+class EventApplication(Base):
+    event_id: PositiveInt
+    vk_id: PositiveInt
+    need_paper_certificate: bool
+    motivation: constr(min_length=5)
+    comment: Optional[str]
+    preferable_role1_id: Optional[PositiveInt]
+    preferable_role2_id: Optional[PositiveInt]
+    preferable_role3_id: Optional[PositiveInt]
+
 
 # Partner
 class PartnerCreate(Base):
@@ -136,3 +129,7 @@ class PartnerCreate(Base):
     description: Optional[str]
     phone_number: Optional[PhoneStr]
     link: UrlStr
+
+
+class OkResponse(Base):
+    ok: bool = True
