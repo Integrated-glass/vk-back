@@ -1,1 +1,1 @@
-from . import organizer, volunteer  # , item
+from . import organizer, volunteer, partner, event  # , item
