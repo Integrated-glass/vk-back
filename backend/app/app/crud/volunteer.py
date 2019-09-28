@@ -1,7 +1,6 @@
 from typing import List, Optional
 from fastapi.encoders import jsonable_encoder
 from sqlalchemy.orm import Session
-from datetime import MINYEAR
 from app.db_models.models import VolunteerLogin, Volunteer
 from app.models.models import VolunteerForm, VolunteerPatch
 
@@ -44,3 +43,10 @@ def update(db_session: Session, *, user: Volunteer, user_in: VolunteerPatch):
     db_session.refresh(user)
 
     return user
+
+
+def get_by_id(db_session: Session, volunteer_id: int) -> Volunteer:
+    return db_session\
+        .query(Volunteer)\
+        .filter(Volunteer.id == volunteer_id)\
+        .one_or_none()

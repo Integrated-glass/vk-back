@@ -144,7 +144,7 @@ class Volunteer(Base):
     __tablename__ = 'volunteers'
 
     id = Column(Integer, primary_key=True)
-    volunteer_id = Column(String, nullable=True, unique=True)  #
+    volunteer_id = Column(String(5), nullable=False, unique=True)  #
 
     karma = Column(Integer, server_default="50")
 
