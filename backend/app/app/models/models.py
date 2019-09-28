@@ -1,7 +1,7 @@
-from pydantic import BaseModel, EmailStr, UrlStr, constr, PositiveInt
-from datetime import date
+from pydantic import BaseModel, EmailStr, UrlStr, constr, PositiveInt, conint
+from datetime import date, datetime
 from typing import Optional, List
-from app.db_models.models import FoodPreferences, ClothSize, phone_number_regex
+from app.db_models.models import FoodPreferences, ClothSize, phone_number_regex, ParticipationStatus
 
 PhoneStr = constr(regex=phone_number_regex)
 
@@ -123,6 +123,16 @@ class EventApplication(Base):
     preferable_role3_id: Optional[PositiveInt]
 
 
+class EventCreate(Base):
+    name: str
+    description: str
+    start_datetime: datetime
+    end_datetime: datetime
+    can_apply: Optional[bool] = True
+    age_restriction: Optional[PositiveInt] = 0
+    importance: conint(ge=0, le=100)
+
+
 # Partner
 class PartnerCreate(Base):
     name: str
@@ -133,3 +143,8 @@ class PartnerCreate(Base):
 
 class OkResponse(Base):
     ok: bool = True
+
+
+class Resolve(Base):
+    application_id: int
+    answer: str

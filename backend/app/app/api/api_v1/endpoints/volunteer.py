@@ -13,9 +13,9 @@ from app import crud
 from app.api.utils.db import get_db
 from app.core import config
 from app.api.utils.security import get_current_user
-from app.db_models.models import Volunteer, VolunteerLogin, Event, EventVolunteer, ParticipationStatus, Role
+from app.db_models.models import Volunteer, VolunteerLogin, Event, EventVolunteer, ParticipationStatus, Role, Organizer
 from app.models.models import VolunteerForm, VolunteerFormResponse, \
-    VolunteerPatch, EventApplication, OkResponse
+    VolunteerPatch, EventApplication, OkResponse, Resolve
 
 router = APIRouter()
 
@@ -100,6 +100,10 @@ def apply_to_event(
                             detail="Вы не авторизировались"
                             )
     volunteer = volunteer_login.volunteer  # type: Volunteer
+    if volunteer is None:
+        raise HTTPException(status_code=HTTP_422_UNPROCESSABLE_ENTITY,
+                            detail="Вы не заполнили анкету волонтера"
+                            )
     roles_can_apply = []
     asked_roles = db.query(Role).filter(or_(Role.id == application.preferable_role1_id,
                                             Role.id == application.preferable_role2_id,
@@ -131,4 +135,41 @@ def apply_to_event(
                             detail="Вы уже подавали заявку на участие в данном мероприятии")
     crud.volunteer.apply(db, application=application, volunteer=volunteer, event=event, roles_can_apply=roles_can_apply)
 
+    return OkResponse()
+
+
+@router.post("/resolve")
+def resolve_volunteer(
+        db: Session = Depends(get_db),
+        organizator: Organizer = Depends(get_current_user),
+        *,
+        answer: Resolve
+):
+    application = db.query(EventVolunteer).filter(
+        EventVolunteer.id == answer.application_id).first()  # type:EventVolunteer
+
+    if application is None:
+        raise HTTPException(status_code=HTTP_422_UNPROCESSABLE_ENTITY,
+                            detail="Заявки с данным id не существует")
+
+    event = db.query(Event).filter(Event.id == application.event_id).first()  # type:Event
+    if event is None:
+        raise HTTPException(status_code=HTTP_422_UNPROCESSABLE_ENTITY,
+                            detail="Мероприятие указанной в заявке не существует")
+
+    event_org = None
+
+    for event_organization in organizator.events:
+        if event_organization.event.id == event.id:
+            event_org = event_organization.event.id
+            break
+    if event_org is None:
+        raise HTTPException(status_code=HTTP_422_UNPROCESSABLE_ENTITY,
+                            detail="Вы пытаетесь получить доступ к чужому мероприятию"
+                            )
+
+    application.participation_status = answer.answer
+    db.add(application)
+    db.commit()
+    db.refresh(application)
     return OkResponse()
