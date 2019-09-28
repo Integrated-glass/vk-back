@@ -1,10 +1,14 @@
 from fastapi import APIRouter
 
-from app.api.api_v1.endpoints import\
-  login, organizers, ping, volunteer, partner, qr
-
+from app.api.api_v1.endpoints import \
+    login, organizers, ping, volunteer, partner, qr
 
 api_router = APIRouter()
+
+
+@api_router.post("/")
+def hello():
+    return {"hello": "world"}
 
 
 api_router.include_router(login.router, tags=["login"])
