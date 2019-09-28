@@ -4,6 +4,7 @@ from sqlalchemy.orm import Session
 from app.api.utils.db import get_db
 import os
 import secrets
+import json
 
 from app.db_models.models import Volunteer, EventVolunteer, QR_data, ParticipationStatus
 from app.crud.volunteer import get_by_id as get_volunteer_by_id
@@ -58,8 +59,12 @@ def volunteer_event_qr(
       create_dir_if_not_exists(qr_dir_path)
       new_qr_data: QR_data = QR_data(salt=secrets.token_urlsafe(16), event_volunteer_id=event_volunteer.id)
       db.add(new_qr_data)
-      qr.make(data=(new_qr_data.salt + str(event_volunteer.id)))\
-        .save(qr_file_path)
+      qr.make(data=json.dumps({
+          "salt": new_qr_data.salt,
+          "participation_id": str(event_volunteer.id),
+        })
+      )\
+      .save(qr_file_path)
 
     return {
       "image_uri": "/qr-img/" + str(volunteer_id) + "/" + qr_filename
