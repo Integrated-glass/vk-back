@@ -132,6 +132,7 @@ class VolunteerLogin(Base):
     name = Column(String, nullable=False)
     surname = Column(String, nullable=False)
     date_of_birth = Column(Date, nullable=True)
+    photo = Column(String, nullable=False)
 
     volunteer = relationship("Volunteer", uselist=False, back_populates="login")
 
@@ -146,7 +147,7 @@ class Volunteer(Base):
     # surname = Column(String, nullable=False) #
     # date_of_birth = Column(Date, nullable=True) #
 
-    karma = Column(Integer, server_default="0")
+    karma = Column(Integer, server_default="50")
 
     interests = relationship('Tag', secondary=volunteer_tag, back_populates='volunteers')
     # additional from presentation

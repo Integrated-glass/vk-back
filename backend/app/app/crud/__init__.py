@@ -1,1 +1,1 @@
-from . import organizer  # , item
+from . import organizer, volunteer  # , item

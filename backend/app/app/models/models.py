@@ -71,6 +71,18 @@ class TokenPayload(Base):
 
 
 # Volunteer
+class VolunteerForm(Base):
+    vk_id: int
+    name: str
+    surname: str
+    date_of_birth: date
+    photo: UrlStr
+
+
+class VolunteerFormResponse(Base):
+    login_id: int
+
+
 class VolunteerForm1(Base):
     vk_id: int
     volunteer_id: str
