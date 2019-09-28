@@ -2,7 +2,7 @@ from pydantic import BaseModel, EmailStr, UrlStr, constr
 from datetime import date
 from typing import Optional, List
 
-PhoneNumber = constr(regex='^\+\d-\d{3}-\d{3}-\d{2}-\d{2}$')
+PhoneNumber = constr(regex=r'^\+\d-\d{3}-\d{3}-\d{2}-\d{2}$')
 
 
 # Base
