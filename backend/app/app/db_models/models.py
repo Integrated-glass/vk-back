@@ -1,9 +1,11 @@
 import enum
+import math
 
 from sqlalchemy import Table, Column, ForeignKey,\
-    Date, DECIMAL, Text, DateTime, Enum, Boolean,\
+    Date, DateTime, Time, DECIMAL, Text, Enum, Boolean,\
     Integer, String, \
     CheckConstraint
+from sqlalchemy.engine.default import DefaultExecutionContext
 from sqlalchemy.orm import relationship
 
 from app.db.base_class import Base
@@ -125,7 +127,7 @@ class Volunteer(Base):
     name = Column(String, nullable=False)
     surname = Column(String, nullable=False)
     date_of_birth = Column(Date, nullable=True)
-    karma = Column(DECIMAL, default=0)
+    karma = Column(Integer, default=0)
 
     interests = relationship('Tag', secondary=volunteer_tag, back_populates='volunteers')
     # additional from presentation
@@ -176,7 +178,6 @@ class Event(Base):
     id = Column(Integer, primary_key=True)
     name = Column(String, nullable=False)
     description = Column(String, nullable=False)
-    base_karma_to_pay = Column(Integer, nullable=False)
     start_datetime = Column(DateTime, nullable=False)
     end_datetime = Column(DateTime, nullable=False)
 
@@ -186,7 +187,31 @@ class Event(Base):
     organizers = relationship("OrganizerEvent", back_populates="event")
     volunteers = relationship("EventVolunteer", back_populates="event")
 
+    @staticmethod
+    def calculate_base_karma(context: DefaultExecutionContext):
+        return math.ceil(context.get_current_parameters()["importance"] * 0.1)
+
+    importance = Column(Integer, CheckConstraint('importance >= 0 and importance <= 100'), nullable=False)
+    base_karma_to_pay = Column(Integer, nullable=False, default=calculate_base_karma, onupdate=calculate_base_karma)
+
     roles = relationship("Role", back_populates="event")
+
+    schedule_records = relationship("EventSchedule", back_populates="event")
+
+
+class EventSchedule(Base):
+    __tablename__ = "event_schedule"
+
+    id = Column(Integer, primary_key=True)
+
+    event_id = Column(Integer, ForeignKey("events.id"), nullable=False)
+    event = relationship("Event", back_populates="schedule_records")
+
+    date = Column(Date, nullable=False)
+    time_begin = Column(Time, nullable=False)
+    time_end = Column(Time, nullable=False)
+
+    description = Column(String, nullable=False)
 
 
 class OrganizerEvent(Base):
@@ -220,7 +245,7 @@ class OrganizerProject(Base):
     id = Column(Integer, primary_key=True)
 
     organizer_id = Column(Integer, ForeignKey("organizers.id"), nullable=False)
-    organizer = relationship("Organizer", back_populates="events")
+    organizer = relationship("Organizer", back_populates="projects")
 
     project_id = Column(Integer, ForeignKey("projects.id"), nullable=False)
     project = relationship("Project", back_populates="organizers")
