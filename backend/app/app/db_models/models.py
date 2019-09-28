@@ -125,21 +125,12 @@ class Volunteer(Base):
     __tablename__ = 'volunteers'
 
     id = Column(Integer, primary_key=True)
-<<<<<<< HEAD
     volunteer_id = Column(String, nullable=False, unique=True) #
     vk_id = Column(Integer, nullable=False, unique=True) #
     name = Column(String, nullable=False) #
     surname = Column(String, nullable=False) #
     date_of_birth = Column(Date, nullable=True) #
     karma = Column(DECIMAL, default=0)
-=======
-    volunteer_id = Column(String, nullable=False, unique=True)
-    vk_id = Column(Integer, nullable=False, unique=True)
-    name = Column(String, nullable=False)
-    surname = Column(String, nullable=False)
-    date_of_birth = Column(Date, nullable=True)
-    karma = Column(Integer, default=0)
->>>>>>> schedule-importance
 
     interests = relationship('Tag', secondary=volunteer_tag, back_populates='volunteers')
     # additional from presentation
