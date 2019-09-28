@@ -10,7 +10,8 @@ from sqlalchemy.orm import relationship
 
 from app.db.base_class import Base
 
-phone_number_regex = r'^\+\d-\d{3}-\d{3}-\d{2}-\d{2}$'
+# phone_number_regex = r'^\+\d-\d{3}-\d{3}-\d{2}-\d{2}$'
+phone_number_regex = r'^\d+$'
 
 
 class Organizer(Base):
@@ -192,7 +193,7 @@ class Role(Base):
     id = Column(Integer, primary_key=True)
     description = Column(String, nullable=False)
     name = Column(String, nullable=False)
-
+    age_restriction = Column(Integer, server_default="0", default=0)
     max_people = Column(Integer, nullable=False)
 
     event_id = Column(Integer, ForeignKey("events.id"), nullable=False)
