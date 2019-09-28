@@ -4,7 +4,7 @@ import math
 from sqlalchemy import Table, Column, ForeignKey,\
     Date, DateTime, Time, DECIMAL, Text, Enum, Boolean,\
     Integer, String,\
-    CheckConstraint
+    CheckConstraint, ColumnDefault, DefaultClause
 from sqlalchemy.engine.default import DefaultExecutionContext
 from sqlalchemy.orm import relationship
 
@@ -130,7 +130,7 @@ class Volunteer(Base):
     name = Column(String, nullable=False) #
     surname = Column(String, nullable=False) #
     date_of_birth = Column(Date, nullable=True) #
-    karma = Column(DECIMAL, default=0)
+    karma = Column(Integer, server_default="0")
 
     interests = relationship('Tag', secondary=volunteer_tag, back_populates='volunteers')
     # additional from presentation
@@ -187,8 +187,8 @@ class Event(Base):
     name = Column(String, nullable=False)
     description = Column(String, nullable=False)
     start_datetime = Column(DateTime, nullable=False)
-    end_datetime = Column(DateTime, nullable=False)
-    can_apply = Column(Boolean, nullable=False, default=True)
+    end_datetime = Column(DateTime, CheckConstraint("end_datetime > start_datetime"), nullable=False)
+    can_apply = Column(Boolean, nullable=False, server_default="true")
 
     project_id = Column(Integer, ForeignKey("projects.id"), nullable=True)
     project = relationship("Project", back_populates="events")
@@ -196,12 +196,15 @@ class Event(Base):
     organizers = relationship("OrganizerEvent", back_populates="event")
     volunteers = relationship("EventVolunteer", back_populates="event")
 
-    @staticmethod
-    def calculate_base_karma(context: DefaultExecutionContext):
-        return math.ceil(context.get_current_parameters()["importance"] * 0.1)
-
     importance = Column(Integer, CheckConstraint('importance >= 0 and importance <= 100'), nullable=False)
-    base_karma_to_pay = Column(Integer, nullable=False, default=calculate_base_karma, onupdate=calculate_base_karma)
+    base_karma_default = DefaultClause("ceil(importance * 0.1)")
+    base_karma_to_pay = Column(
+        Integer,
+        CheckConstraint("base_karma_to_pay = ceil(importance * 0.1)"),
+        nullable=False,
+        server_default=base_karma_default,
+        server_onupdate=base_karma_default
+    )
 
     roles = relationship("Role", back_populates="event")
 
@@ -218,7 +221,7 @@ class EventSchedule(Base):
 
     date = Column(Date, nullable=False)
     time_begin = Column(Time, nullable=False)
-    time_end = Column(Time, nullable=False)
+    time_end = Column(Time, CheckConstraint("time_end > time_begin"), nullable=False)
 
     description = Column(String, nullable=False)
 
@@ -301,7 +304,7 @@ class TODO(Base):
     __tablename__ = 'todos'
 
     id = Column(Integer, primary_key=True)
-    is_done = Column(Boolean, default=False)
+    is_done = Column(Boolean, server_default="false")
     name = Column(String, nullable=False)
     description = Column(String, nullable=True)
     deadline = Column(DateTime, nullable=True)
