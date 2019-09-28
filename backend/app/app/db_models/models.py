@@ -196,14 +196,17 @@ class Event(Base):
     organizers = relationship("OrganizerEvent", back_populates="event")
     volunteers = relationship("EventVolunteer", back_populates="event")
 
+    @staticmethod
+    def calculate_default_karma(context: DefaultExecutionContext):
+        return math.ceil(context.get_current_parameters()["importance"] * 0.1)
+
     importance = Column(Integer, CheckConstraint('importance >= 0 and importance <= 100'), nullable=False)
-    base_karma_default = DefaultClause("ceil(importance * 0.1)")
     base_karma_to_pay = Column(
         Integer,
         CheckConstraint("base_karma_to_pay = ceil(importance * 0.1)"),
         nullable=False,
-        server_default=base_karma_default,
-        server_onupdate=base_karma_default
+        default=calculate_default_karma,
+        onupdate=calculate_default_karma
     )
 
     roles = relationship("Role", back_populates="event")
