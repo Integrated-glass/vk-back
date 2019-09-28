@@ -48,11 +48,11 @@ services:
       # HASURA_GRAPHQL_ADMIN_SECRET: myadminsecretkey
 
   httpsproxy:
-    build:
-      context: ./
-      cache_from:
-        - nginx
-        - httpsproxy
+    #build:
+     # context: ./
+      #cache_from:
+      #  - nginx
+       # - httpsproxy
     depends_on:
       - backend
     image: nginx:alpine
@@ -66,6 +66,7 @@ services:
       - "443:$PROXY_PORT"
     volumes:
       - ../nginx/config:/etc/nginx
+      - ${SSL_FILES_PATH}:/ssl
 
 volumes:
   db-data:
