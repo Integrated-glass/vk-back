@@ -219,6 +219,7 @@ class Event(Base):
     start_datetime = Column(DateTime, nullable=False)
     end_datetime = Column(DateTime, CheckConstraint("end_datetime > start_datetime"), nullable=False)
     can_apply = Column(Boolean, nullable=False, server_default="true")
+    age_restriction = Column(Integer, server_default="0", default=0)
 
     project_id = Column(Integer, ForeignKey("projects.id"), nullable=True)
     project = relationship("Project", back_populates="events")
