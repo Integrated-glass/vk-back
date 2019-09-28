@@ -2,7 +2,7 @@ from pydantic import BaseModel, EmailStr, UrlStr, constr
 from datetime import date
 from typing import Optional, List
 
-PhoneNumber = constr(regex='^\+\d-\d{3}-\d{3}-\d{2}-\d{2}$')
+PhoneStr = constr(regex=r'^\+\d-\d{3}-\d{3}-\d{2}-\d{2}$')
 
 
 # Base
@@ -32,7 +32,7 @@ class OrganizerCreate(Base):
     email: EmailStr
     password: str
     company: str
-    phone_number: PhoneNumber
+    phone_number: PhoneStr
     social_link: UrlStr
     position: str
 
@@ -49,7 +49,7 @@ class Organizer(Base):
     surname: str
     email: EmailStr
     company: str
-    phone_number: PhoneNumber
+    phone_number: PhoneStr
     social_link: UrlStr
     position: str
 
@@ -67,3 +67,27 @@ class Token(Base):
 
 class TokenPayload(Base):
     user_id: int = None
+
+
+# Volunteer
+class VolunteerForm1(Base):
+    vk_id: int
+    volunteer_id: str
+    name: str
+    surname: str
+    date_of_birth: date
+    email: EmailStr
+    phone: PhoneStr
+    volunteering_experience: str
+    speciality: str
+
+
+class VolunteerForm2(Base):
+    vk_id: int
+    interested_in_projects: str
+    children_work_experience: str
+    additional_skills: str
+    reasons_to_work: str
+    expectations: Optional[str]
+    accept_news: Optional[bool] = True
+    known_by_id: int
