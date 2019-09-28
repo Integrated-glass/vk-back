@@ -8,7 +8,7 @@ from app.db_models.models import Partner, EventPartnerAssociation, Event
 from app.models.models import PartnerCreate
 
 
-def get(db_session: Session, *, user_id: int) -> Optional[Optional]:
+def get(db_session: Session, *, user_id: int) -> Optional[Partner]:
     return db_session.query(Partner).filter(Partner.id == user_id)
 
 
