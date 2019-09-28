@@ -109,7 +109,7 @@ def create_user_open(
     user = crud.organizer.create(db, user_in=user_create)
     return {
         "access_token": create_access_token(
-            data={"user_id": user.id}, expires_delta= ACCESS_TOKEN_EXPIRE_MINUTES
+            data={"user_id": user.id}
         ),
         "token_type": "bearer"
     }
