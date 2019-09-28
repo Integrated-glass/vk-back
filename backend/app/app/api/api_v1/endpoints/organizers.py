@@ -10,7 +10,9 @@ from app.api.utils.db import get_db
 from app.core import config
 from app.api.utils.security import get_current_user
 from app.db_models.models import Organizer as DBUser
-from app.models.models import Organizer, OrganizerCreate, OrganizerInDB, OrganizerUpdate
+from app.models.models import Organizer, OrganizerCreate, Token
+from app.core.jwt import create_access_token
+from app.core.config import ACCESS_TOKEN_EXPIRE_MINUTES
 
 router = APIRouter()
 
@@ -84,7 +86,7 @@ def read_user_me(
     return current_user
 
 
-@router.post("/register", response_model=Organizer)
+@router.post("/register", response_model=Token)
 def create_user_open(
     *,
     db: Session = Depends(get_db),
@@ -105,7 +107,12 @@ def create_user_open(
             detail="The user with this username already exists in the system",
         )
     user = crud.organizer.create(db, user_in=user_create)
-    return user
+    return {
+        "access_token": create_access_token(
+            data={"user_id": user.id}
+        ),
+        "token_type": "bearer"
+    }
 
 
 # @router.get("/{user_id}", response_model=Organizer)
