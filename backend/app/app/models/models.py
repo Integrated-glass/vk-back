@@ -79,7 +79,7 @@ class VolunteerForm(Base):
     photo: UrlStr
 
 
-class VolunteerFormResponse(Base):
+class VolunteerFormResponse(VolunteerForm):
     login_id: int
 
 
