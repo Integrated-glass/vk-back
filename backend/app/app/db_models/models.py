@@ -1,14 +1,16 @@
 import enum
 import math
 
-from sqlalchemy import Table, Column, ForeignKey,\
-    Date, DateTime, Time, DECIMAL, Text, Enum, Boolean,\
-    Integer, String,\
+from sqlalchemy import Table, Column, ForeignKey, \
+    Date, DateTime, Time, DECIMAL, Text, Enum, Boolean, \
+    Integer, String, \
     CheckConstraint, ColumnDefault, DefaultClause
 from sqlalchemy.engine.default import DefaultExecutionContext
 from sqlalchemy.orm import relationship
 
 from app.db.base_class import Base
+
+phone_number_regex = r'^\+\d-\d{3}-\d{3}-\d{2}-\d{2}$'
 
 
 class Organizer(Base):
@@ -22,6 +24,7 @@ class Organizer(Base):
     position = Column(String, nullable=False)
     social_link = Column(String, nullable=False)
     phone_number = Column(String, nullable=False)
+    phone_number_constraint = CheckConstraint(f"phone_number ~* {phone_number_regex}")
     email = Column(String, nullable=False, unique=True)
     password_hash = Column(String, nullable=False)
 
@@ -121,38 +124,55 @@ class ClothSize(enum.Enum):
     XXL = "XXL"
 
 
+class VolunteerLogin(Base):
+    __tablename__ = 'volunteer_logins'
+
+    id = Column(Integer, primary_key=True)
+    vk_id = Column(Integer, nullable=False, unique=True)
+    name = Column(String, nullable=False)
+    surname = Column(String, nullable=False)
+    date_of_birth = Column(Date, nullable=True)
+
+    volunteer = relationship("Volunteer", uselist=False, back_populates="login")
+
+
 class Volunteer(Base):
     __tablename__ = 'volunteers'
 
     id = Column(Integer, primary_key=True)
-    volunteer_id = Column(String, nullable=False, unique=True) #
-    vk_id = Column(Integer, nullable=False, unique=True) #
-    name = Column(String, nullable=False) #
-    surname = Column(String, nullable=False) #
-    date_of_birth = Column(Date, nullable=True) #
+    volunteer_id = Column(String, nullable=False, unique=True)  #
+    # vk_id = Column(Integer, nullable=False, unique=True) #
+    # name = Column(String, nullable=False) #
+    # surname = Column(String, nullable=False) #
+    # date_of_birth = Column(Date, nullable=True) #
+
     karma = Column(Integer, server_default="0")
 
     interests = relationship('Tag', secondary=volunteer_tag, back_populates='volunteers')
     # additional from presentation
     email = Column(String, nullable=False, unique=True)  #
-    phone = Column(String(length=20))  #
-    work = Column(String)  #
+    phone_number = Column(String(length=20), nullable=False)  #
+    phone_number_constraint = CheckConstraint(f"phone_number ~* {phone_number_regex}")
+    work = Column(String, nullable=False)  #
     speciality = Column(String, nullable=True)  #
     food_preferences = Column(Enum(FoodPreferences), nullable=True)  ###
     volunteering_experience = Column(Text, nullable=True)  #
-    interested_in_projects = Column(Text, nullable=True)  ## *
-    children_work_experience = Column(Text, nullable=True)  ## *
-    additional_skills = Column(String, nullable=True) ## *
-    reasons_to_work = Column(String, nullable=True) ## *
+    interested_in_projects = Column(Text, nullable=False)  ## *
+    children_work_experience = Column(Text, nullable=False)  ## *
+    additional_skills = Column(String, nullable=False)  ## *
+    reasons_to_work = Column(String, nullable=False)  ## *
     expectations = Column(Text, nullable=True)  ##
     medical_contradictions = Column(Text, nullable=True)  ###
-    cloth_size = Column(Enum(ClothSize), nullable=True)  ### *
+    cloth_size = Column(Enum(ClothSize), nullable=False)  ### *
     accept_news = Column(Boolean, ColumnDefault(True), server_default='t')  ##
 
     ### save photo
 
+    login_id = Column(Integer, ForeignKey("volunteer_logins.id"))
+    login = relationship("VolunteerLogin", back_populates="volunteer")
+
     languages = relationship("VolunteerLanguageAssociation", back_populates="volunteer")  #
-    known_by_id = Column(Integer, ForeignKey("information_sources.id"))
+    known_by_id = Column(Integer, ForeignKey("information_sources.id"), nullable=False)
     known_by = relationship("InformationSource", back_populates='volunteers')  ## *
 
     events = relationship("EventVolunteer", back_populates="volunteer")

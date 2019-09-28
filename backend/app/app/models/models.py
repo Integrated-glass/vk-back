@@ -1,8 +1,9 @@
 from pydantic import BaseModel, EmailStr, UrlStr, constr
 from datetime import date
 from typing import Optional, List
+from app.db_models.models import FoodPreferences, ClothSize, phone_number_regex
 
-PhoneStr = constr(regex=r'^\+\d-\d{3}-\d{3}-\d{2}-\d{2}$')
+PhoneStr = constr(regex=phone_number_regex)
 
 
 # Base
@@ -77,9 +78,10 @@ class VolunteerForm1(Base):
     surname: str
     date_of_birth: date
     email: EmailStr
-    phone: PhoneStr
+    phone_number: PhoneStr
     volunteering_experience: str
     speciality: str
+    languages: List[int]
 
 
 class VolunteerForm2(Base):
@@ -91,3 +93,10 @@ class VolunteerForm2(Base):
     expectations: Optional[str]
     accept_news: Optional[bool] = True
     known_by_id: int
+
+
+class VolunteerForm3(Base):
+    vk_id: int
+    food_preferences: Optional[FoodPreferences]
+    medical_contradictions: Optional[str]
+    cloth_size: ClothSize
