@@ -141,7 +141,7 @@ class Volunteer(Base):
     __tablename__ = 'volunteers'
 
     id = Column(Integer, primary_key=True)
-    volunteer_id = Column(String, nullable=False, unique=True)  #
+    volunteer_id = Column(String(5), nullable=False, unique=True)  #
     # vk_id = Column(Integer, nullable=False, unique=True) #
     # name = Column(String, nullable=False) #
     # surname = Column(String, nullable=False) #

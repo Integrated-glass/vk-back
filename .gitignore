@@ -200,3 +200,6 @@ dmypy.json
 
 # Venv
 .venv
+
+# App generated
+qr-img/
