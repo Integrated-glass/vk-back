@@ -20,7 +20,7 @@ from app.models.models import VolunteerForm, VolunteerFormResponse, \
 router = APIRouter()
 
 
-@router.post("/login", response_model=VolunteerFormResponse)
+@router.post("/login", response_model=VolunteerPatch)
 def form_step_0(
         *,
         db: Session = Depends(get_db),
