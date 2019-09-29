@@ -40,8 +40,11 @@ def volunteer_id_qr(
   if (not os.path.exists(qr_path)) or need_regenerate:
     create_dir_if_not_exists(volunteer_dir)
     volunteer: Volunteer = get_volunteer_by_id(db, volunteer_id)
-    qr.make(data=volunteer.volunteer_id)\
-      .save(qr_path)
+    if volunteer is None:
+      raise HTTPException(HTTP_400_BAD_REQUEST, "The volunteer does not exist.")
+    else:
+      qr.make(data=volunteer.volunteer_id)\
+        .save(qr_path)
 
   return {
     "image_uri": "/qr-img/" + str(volunteer_id) + "/" + volunteer_id_qr_filename
@@ -96,7 +99,7 @@ def validate_volunteer_id(
   if volunteer is None:
     raise HTTPException(HTTP_400_BAD_REQUEST, "The specified volunteer_id does not exist in the system.")
   else:
-    log_volunteer_visit(db, volunteer_id=volunteer_id)
+    log_volunteer_visit(db, volunteer_id=volunteer.id)
 
     return {
       "message": "Ok."

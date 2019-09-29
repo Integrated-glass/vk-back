@@ -53,7 +53,7 @@ def get_by_id(db_session: Session, volunteer_id: int) -> Volunteer:
         .one_or_none()
 
 
-def get_by_volunteer_id(db_session: Session, volunteer_id: int) -> Volunteer:
+def get_by_volunteer_id(db_session: Session, volunteer_id: str) -> Volunteer:
     return db_session \
         .query(Volunteer) \
         .filter_by(volunteer_id=volunteer_id) \
