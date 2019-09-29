@@ -79,6 +79,12 @@ volunteer_tag = Table(
     Column('tag_id', Integer, ForeignKey('tags.id'), nullable=False),
 )
 
+event_tag = Table(
+    "event_tags", Base.metadata,
+    Column("event_id", Integer, ForeignKey("events.id"), nullable=False),
+    Column("tag_id", Integer, ForeignKey("tags.id"), nullable=False)
+)
+
 
 class Tag(Base):
     __tablename__ = 'tags'
@@ -87,6 +93,7 @@ class Tag(Base):
     name = Column(String, nullable=False, unique=True)
 
     volunteers = relationship('Volunteer', secondary=volunteer_tag, back_populates="interests")
+    events = relationship('Event', secondary=event_tag, back_populates="interests")
 
 
 class VolunteerLanguageAssociation(Base):
@@ -232,10 +239,12 @@ class Event(Base):
     age_restriction = Column(Integer, server_default="0", default=0)
     location = Column(String, nullable=False, server_default="''")
 
+    interests = relationship('Tag', secondary=event_tag, back_populates='events')
+
     project_id = Column(Integer, ForeignKey("projects.id"), nullable=True)
     project = relationship("Project", back_populates="events")
 
-    photos = relationship("Photo",back_populates="event")
+    photos = relationship("Photo", back_populates="event")
     organizers = relationship("OrganizerEvent", back_populates="event")
     volunteers = relationship("EventVolunteer", back_populates="event")
     partners = relationship("EventPartnerAssociation", back_populates="event")
