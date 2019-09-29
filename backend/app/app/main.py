@@ -21,6 +21,7 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+app.mount("/event_images", StaticFiles(directory="event_images"), name="event_images")
 app.mount("/qr-img", StaticFiles(directory=qr_images_directory), name="qr-img")
 app.include_router(api_router, prefix=config.API_V1_STR)
 
