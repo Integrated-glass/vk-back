@@ -30,7 +30,7 @@ create_dir_if_not_exists(qr_images_directory)
 def volunteer_id_qr(
   db: Session = Depends(get_db),
   *,
-  need_regenerate: bool = Query(False),
+  need_regenerate: bool = False,
   volunteer_id: int,
 ):
   volunteer_id_qr_filename = "volunteer_id.png"
@@ -55,7 +55,7 @@ def volunteer_id_qr(
 def volunteer_event_qr(
   db: Session = Depends(get_db),
   *,
-  need_regenerate: bool = Query(False),
+  need_regenerate: bool = False,
   volunteer_id: int,
   event_id: int,
 ):
@@ -70,12 +70,20 @@ def volunteer_event_qr(
   elif event_volunteer.participation_status == ParticipationStatus.APPROVED:
     if (not os.path.exists(qr_file_path)) or need_regenerate:
       create_dir_if_not_exists(qr_dir_path)
-      new_qr_data: QR_data = QR_data(salt=secrets.token_urlsafe(16), event_volunteer_id=event_volunteer.id)
-      db.add(new_qr_data)
-      db.commit()
-      db.refresh(new_qr_data)
+
+      qr_data: QR_data = event_volunteer.qr_data
+      if qr_data is None:
+        qr_data: QR_data = QR_data(salt=secrets.token_urlsafe(16), event_volunteer_id=event_volunteer.id)
+        db.add(qr_data)
+        db.commit()
+        db.refresh(qr_data)
+      else:
+        qr_data.salt = secrets.token_urlsafe(16)
+        db.commit()
+        db.refresh(qr_data)
+
       qr.make(data=json.dumps({
-          "salt": new_qr_data.salt,
+          "salt": qr_data.salt,
           "participation_id": str(event_volunteer.id),
         })
       )\
