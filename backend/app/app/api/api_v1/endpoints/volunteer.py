@@ -53,7 +53,7 @@ def form_step_0(
         for field in user_data:
             return_data.update({field: getattr(user, field, None)})
         return_data["login_id"] = user.id
-        del return_data["id"]
+        return_data["id"] = volunteer.id
         del return_data["volunteer"]
         return return_data
 
