@@ -118,7 +118,7 @@ def volunteer_event_qr(
   )
 
   if event_volunteer is not None:
-    if db.query(event_volunteer.qr_data).filter_by(salt=salt).one_or_none() is None:
+    if event_volunteer.qr_data.salt != salt:
       raise HTTPException(HTTP_400_BAD_REQUEST, "Invalid QR.")
     else:
       log_volunteer_event_visit(
