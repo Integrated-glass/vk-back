@@ -81,12 +81,11 @@ class VolunteerForm(Base):
     vk_id: PositiveInt
     name: str
     surname: str
-    date_of_birth: Optional[date]
+    date_of_birth: Optional[str]
     photo: UrlStr
 
 
 class VolunteerFormResponse(Base):
-    vk_id: PositiveInt
     name: Optional[str]
     surname: Optional[str]
     date_of_birth: Optional[date]

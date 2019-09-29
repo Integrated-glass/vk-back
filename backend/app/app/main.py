@@ -17,7 +17,8 @@ logger.setLevel(logging.DEBUG)
 app = FastAPI(title=config.PROJECT_NAME, docs_url="/api/docs", redoc_url="/api/redoc", openapi_url="/api/openapi.json")
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["https://vk.com/app7150400", "https://vk-volunteer-app.vanishmax.now.sh"],
+    allow_origins=["https://vk.com/app7150400", "https://vk-volunteer-app.vanishmax.now.sh",
+                   "https://vk-orgy.vanishmax.now.sh"],
     allow_credentials=True,
     allow_methods=["POST", "GET"],
     allow_headers=["*"],
@@ -30,7 +31,6 @@ app.include_router(api_router, prefix=config.API_V1_STR)
 
 @app.middleware("http")
 async def db_session_middleware(request: Request, call_next):
-    logger.debug("Entered middleware")
     request.state.db = Session()
     response = await call_next(request)
     request.state.db.close()

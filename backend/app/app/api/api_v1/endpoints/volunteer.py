@@ -41,20 +41,24 @@ def form_step_0(
             "phone_number": None
         }
     else:
-        volunteer = user.volunteer
         return_data = {}
+        user_data = jsonable_encoder(user)
+        for field in user_data:
+            return_data.update({field: getattr(user, field, None)})
+
+        volunteer = user.volunteer
         if volunteer is not None:
             volunteer_data = jsonable_encoder(volunteer)
             return_data.update({"interests": volunteer.interests})
             for field in volunteer_data:
                 return_data.update({field: getattr(volunteer, field, None)})
+            return_data["id"] = volunteer.id
 
-        user_data = jsonable_encoder(user)
-        for field in user_data:
-            return_data.update({field: getattr(user, field, None)})
         return_data["login_id"] = user.id
-        return_data["id"] = volunteer.id
-        del return_data["volunteer"]
+        try:
+            del return_data["volunteer"]
+        except:
+            pass
         return return_data
 
 
