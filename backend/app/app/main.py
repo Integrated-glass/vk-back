@@ -16,10 +16,11 @@ logger.setLevel(logging.DEBUG)
 app = FastAPI(title=config.PROJECT_NAME, docs_url="/api/docs", redoc_url="/api/redoc", openapi_url="/api/openapi.json")
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=['*'],
+    allow_origins=["*", "https://vk.com/app7150400", "https://vk-volunteer-app.vanishmax.now.sh/"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
+
 )
 app.mount("/api/event_images", StaticFiles(directory="event_images"), name="event_images")
 app.mount("/api/qr-img", StaticFiles(directory=qr_images_directory), name="qr-img")
