@@ -28,7 +28,9 @@ def form_step_0(
 ):
     user = crud.volunteer.get_login(db, user_in=data)
     if user is None:
-        data = crud.volunteer.create(db, user_in=data)
+        data = crud.volunteer.create(db, user_in=data) # type:VolunteerLogin
+
+
         return {
             "vk_id": data.vk_id,
             "name": data.name,
@@ -41,6 +43,16 @@ def form_step_0(
         }
     else:
         volunteer = user.volunteer
+        return_data = {}
+        if volunteer is not None:
+            volunteer_data = jsonable_encoder(volunteer)
+            for field in volunteer_data:
+                return_data.update({field: getattr(volunteer, field, None)})
+        user_data = jsonable_encoder(user)
+        for field in user_data:
+            return_data.update({field: getattr(user, field, None)})
+        return_data["login_id"] = user.id
+        del return_data["id"]
         return {
             "vk_id": user.vk_id,
             "name": user.name,
