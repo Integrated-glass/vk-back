@@ -37,7 +37,7 @@ def volunteer_id_qr(
   volunteer_dir = qr_images_directory + "/" + str(volunteer_id)
   qr_path = volunteer_dir + "/" + volunteer_id_qr_filename
 
-  if not os.path.exists(qr_path) or need_regenerate:
+  if (not os.path.exists(qr_path)) or need_regenerate:
     create_dir_if_not_exists(volunteer_dir)
     volunteer: Volunteer = get_volunteer_by_id(db, volunteer_id)
     qr.make(data=volunteer.volunteer_id)\
@@ -90,7 +90,7 @@ def validate_volunteer_id(
   db: Session = Depends(get_db),
   current_user: Organizer = Depends(get_current_user),
   *,
-  volunteer_id: int,
+  volunteer_id: str,
 ):
   volunteer: Volunteer = get_volunteer_by_volunteer_id(db, volunteer_id)
   if volunteer is None:
