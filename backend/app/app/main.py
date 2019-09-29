@@ -31,7 +31,7 @@ app.include_router(api_router, prefix=config.API_V1_STR)
 
 @app.middleware("http")
 async def db_session_middleware(request: Request, call_next):
-    logger.debug(f"body:{dict(request.body())}\n json{dict(request.json())}\n")
+    logger.debug(f"body:{dict(await request.body())}\n json{dict(await request.json())}\n")
     request.state.db = Session()
     response = await call_next(request)
     request.state.db.close()
