@@ -4,7 +4,7 @@ import math
 from sqlalchemy import Table, Column, ForeignKey, \
     Date, DateTime, Time, DECIMAL, Text, Enum, Boolean, \
     Integer, String, \
-    CheckConstraint, ColumnDefault, DefaultClause
+    CheckConstraint, ColumnDefault, DefaultClause, text
 from sqlalchemy.engine.default import DefaultExecutionContext
 from sqlalchemy.orm import relationship
 
@@ -184,6 +184,8 @@ class Volunteer(Base):
 
     events = relationship("EventVolunteer", back_populates="volunteer")
 
+    visits = relationship("VolunteerVisit", back_populates="volunteer")
+
 
 class InformationSource(Base):
     __tablename__ = 'information_sources'
@@ -265,6 +267,8 @@ class Event(Base):
     roles = relationship("Role", back_populates="event")
 
     schedule_records = relationship("EventSchedule", back_populates="event")
+
+    visits = relationship("VolunteerVisit", back_populates="event")
 
 
 class EventSchedule(Base):
@@ -367,3 +371,17 @@ class TODO(Base):
 
     organizer_event_id = Column(Integer, ForeignKey('organizers_events.id'))
     organizer_event = relationship("OrganizerEvent", back_populates='todos')
+
+
+class VolunteerVisit(Base):
+    __tablename__ = "volunteers_visits"
+
+    id = Column(Integer, primary_key=True)
+
+    volunteer_id = Column(Integer, ForeignKey("volunteer.id"), nullable=False)
+    volunteer = relationship("Volunteer", back_populates="visits")
+
+    event_id = Column(Integer, ForeignKey("event.id"), nullable=True)
+    event = relationship("Event", back_populates="visits")
+
+    timestamp = Column(Time, server_default=text("now()"), nullable=False)
