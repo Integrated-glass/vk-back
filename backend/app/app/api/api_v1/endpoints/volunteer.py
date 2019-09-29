@@ -15,12 +15,12 @@ from app.core import config
 from app.api.utils.security import get_current_user
 from app.db_models.models import Volunteer, VolunteerLogin, Event, EventVolunteer, ParticipationStatus, Role, Organizer
 from app.models.models import VolunteerForm, VolunteerFormResponse, \
-    VolunteerPatch, EventApplication, OkResponse, Resolve
+    EventApplication, OkResponse, Resolve, VolunteerPatch
 
 router = APIRouter()
 
 
-@router.post("/login", response_model=VolunteerPatch)
+@router.post("/login", response_model=VolunteerFormResponse)
 def form_step_0(
         *,
         db: Session = Depends(get_db),
@@ -53,7 +53,7 @@ def form_step_0(
         }
 
 
-@router.post("/patch", response_model=VolunteerPatch)
+@router.post("/patch", response_model=VolunteerFormResponse)
 def patch(
         db: Session = Depends(get_db),
         *,
