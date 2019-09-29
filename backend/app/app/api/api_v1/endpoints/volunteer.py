@@ -28,8 +28,7 @@ def form_step_0(
 ):
     user = crud.volunteer.get_login(db, user_in=data)
     if user is None:
-        data = crud.volunteer.create(db, user_in=data) # type:VolunteerLogin
-
+        data = crud.volunteer.create(db, user_in=data)  # type:VolunteerLogin
 
         return {
             "vk_id": data.vk_id,
@@ -50,12 +49,11 @@ def form_step_0(
             for field in volunteer_data:
                 return_data.update({field: getattr(volunteer, field, None)})
 
-
         user_data = jsonable_encoder(user)
         for field in user_data:
             return_data.update({field: getattr(user, field, None)})
         return_data["login_id"] = user.id
-        del return_data["id"]
+        return_data["id"] = volunteer.id
         del return_data["volunteer"]
         return return_data
 
@@ -65,7 +63,7 @@ def patch(
         db: Session = Depends(get_db),
         *,
         vk_id: int = Body(...),
-        update_data: VolunteerPatch
+        update_data: VolunteerFormResponse
 ):
     volunteer_login = crud.volunteer.get_login_vk_id(db, vk_id=vk_id)
     if volunteer_login is None:
@@ -90,7 +88,7 @@ def apply_to_event(
     event = db.query(Event).filter(Event.id == application.event_id).first()  # type: Event
     if event is None:
         raise HTTPException(status_code=HTTP_422_UNPROCESSABLE_ENTITY,
-                            detail="Мероприятие с данным id не существуем"
+                            detail="Мероприятие с данным id не существует"
                             )
     if event.start_datetime < datetime.today():
         raise HTTPException(status_code=HTTP_422_UNPROCESSABLE_ENTITY,
@@ -136,11 +134,22 @@ def apply_to_event(
     if len(roles_can_apply) == 0:
         raise HTTPException(status_code=HTTP_422_UNPROCESSABLE_ENTITY,
                             detail="Нет свободных мест или вы не подходите по возрасту к выбранным ролям")
-    if db.query(EventVolunteer).filter(and_(EventVolunteer.volunteer_id == volunteer.id,
-                                            EventVolunteer.event_id == event.id)).first() is not None:
-        raise HTTPException(status_code=HTTP_422_UNPROCESSABLE_ENTITY,
-                            detail="Вы уже подавали заявку на участие в данном мероприятии")
-    crud.volunteer.apply(db, application=application, volunteer=volunteer, event=event, roles_can_apply=roles_can_apply)
+    existing_application = db.query(EventVolunteer).filter(and_(EventVolunteer.volunteer_id == volunteer.id,
+                                                                EventVolunteer.event_id == event.id)).first()  # type: EventVolunteer
+    if existing_application is not None:
+        if existing_application.participation_status == ParticipationStatus.WAITING:
+            existing_application.preferable_role1_id = application.preferable_role1_id
+            existing_application.preferable_role2_id = application.preferable_role2_id
+            existing_application.preferable_role3_id = application.preferable_role3_id
+            db.add(existing_application)
+            db.commit()
+            db.refresh(existing_application)
+        else:
+            raise HTTPException(status_code=HTTP_422_UNPROCESSABLE_ENTITY,
+                                detail="Вы ранее подавали заявку на участие в данном мероприятии и уже не можете её изменить")
+    else:
+        crud.volunteer.apply(db, application=application, volunteer=volunteer, event=event,
+                             roles_can_apply=roles_can_apply)
 
     return OkResponse()
 
