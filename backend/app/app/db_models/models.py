@@ -384,4 +384,4 @@ class VolunteerVisit(Base):
     event_id = Column(Integer, ForeignKey("events.id"), nullable=True)
     event = relationship("Event", back_populates="visits")
 
-    timestamp = Column(Time, server_default=text("now()"), nullable=False)
+    timestamp = Column(DateTime, server_default=text("now()"), nullable=False)
