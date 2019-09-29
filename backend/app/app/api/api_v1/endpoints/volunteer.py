@@ -63,7 +63,7 @@ def patch(
         db: Session = Depends(get_db),
         *,
         vk_id: int = Body(...),
-        update_data: VolunteerPatch
+        update_data: VolunteerFormResponse
 ):
     volunteer_login = crud.volunteer.get_login_vk_id(db, vk_id=vk_id)
     if volunteer_login is None:

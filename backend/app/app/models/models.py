@@ -85,9 +85,14 @@ class VolunteerForm(Base):
     photo: UrlStr
 
 
-class VolunteerFormResponse(VolunteerForm):
-    login_id: PositiveInt
-    email: Optional[str]
+class VolunteerFormResponse(Base):
+    vk_id: PositiveInt
+    name: Optional[str]
+    surname: Optional[str]
+    date_of_birth: Optional[date]
+    login_id: Optional[PositiveInt]
+    photo: Optional[UrlStr]
+    email: Optional[EmailStr]
     phone_number: Optional[str]
     login_id: Optional[int]
     volunteer_id: Optional[str]
