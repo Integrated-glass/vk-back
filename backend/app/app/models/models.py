@@ -86,7 +86,6 @@ class VolunteerForm(Base):
 
 
 class VolunteerFormResponse(Base):
-    vk_id: PositiveInt
     name: Optional[str]
     surname: Optional[str]
     date_of_birth: Optional[date]
