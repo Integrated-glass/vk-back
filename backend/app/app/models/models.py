@@ -89,6 +89,23 @@ class VolunteerFormResponse(VolunteerForm):
     login_id: PositiveInt
     email: Optional[str]
     phone_number: Optional[str]
+    login_id: Optional[int]
+    volunteer_id: Optional[str]
+    email: Optional[EmailStr]
+    phone_number: Optional[PhoneStr]
+    volunteering_experience: Optional[str]
+    speciality: Optional[str]
+    languages: Optional[List[int]]
+    interested_in_projects: Optional[str]
+    children_work_experience: Optional[str]
+    additional_skills: Optional[str]
+    reasons_to_work: Optional[str]
+    expectations: Optional[str]
+    accept_news: Optional[bool]
+    known_by_id: Optional[int]
+    food_preferences: Optional[str]
+    medical_contradictions: Optional[str]
+    cloth_size: Optional[str]
 
 
 class VolunteerPatch(Base):

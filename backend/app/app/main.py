@@ -13,7 +13,7 @@ import logging
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 
-app = FastAPI(title=config.PROJECT_NAME)
+app = FastAPI(title=config.PROJECT_NAME, docs_url="/api/docs", redoc_url="/api/redoc", openapi_url="/api/openapi.json")
 app.add_middleware(
     CORSMiddleware,
     allow_origins=['*'],
@@ -21,6 +21,7 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+app.mount("/event_images", StaticFiles(directory="event_images"), name="event_images")
 app.mount("/qr-img", StaticFiles(directory=qr_images_directory), name="qr-img")
 app.include_router(api_router, prefix=config.API_V1_STR)
 

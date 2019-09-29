@@ -15,12 +15,12 @@ from app.core import config
 from app.api.utils.security import get_current_user
 from app.db_models.models import Volunteer, VolunteerLogin, Event, EventVolunteer, ParticipationStatus, Role, Organizer
 from app.models.models import VolunteerForm, VolunteerFormResponse, \
-    VolunteerPatch, EventApplication, OkResponse, Resolve
+    EventApplication, OkResponse, Resolve, VolunteerPatch
 
 router = APIRouter()
 
 
-@router.post("/login", response_model=VolunteerFormResponse)
+@router.post("/login")
 def form_step_0(
         *,
         db: Session = Depends(get_db),
@@ -28,7 +28,9 @@ def form_step_0(
 ):
     user = crud.volunteer.get_login(db, user_in=data)
     if user is None:
-        data = crud.volunteer.create(db, user_in=data)
+        data = crud.volunteer.create(db, user_in=data) # type:VolunteerLogin
+
+
         return {
             "vk_id": data.vk_id,
             "name": data.name,
@@ -41,19 +43,24 @@ def form_step_0(
         }
     else:
         volunteer = user.volunteer
-        return {
-            "vk_id": user.vk_id,
-            "name": user.name,
-            "surname": user.surname,
-            "date_of_birth": user.date_of_birth,
-            "photo": user.photo,
-            "login_id": user.id,
-            "email": getattr(volunteer, "email", None),
-            "phone_number": getattr(volunteer, "phone_number", None)
-        }
+        return_data = {}
+        if volunteer is not None:
+            volunteer_data = jsonable_encoder(volunteer)
+            return_data.update({"interests": volunteer.interests})
+            for field in volunteer_data:
+                return_data.update({field: getattr(volunteer, field, None)})
 
 
-@router.post("/patch", response_model=VolunteerPatch)
+        user_data = jsonable_encoder(user)
+        for field in user_data:
+            return_data.update({field: getattr(user, field, None)})
+        return_data["login_id"] = user.id
+        del return_data["id"]
+        del return_data["volunteer"]
+        return return_data
+
+
+@router.post("/patch", response_model=VolunteerFormResponse)
 def patch(
         db: Session = Depends(get_db),
         *,
