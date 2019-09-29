@@ -210,6 +210,16 @@ class EventPartnerAssociation(Base):
     event = relationship("Event", back_populates="partners")
 
 
+class Photo(Base):
+    __tablename__ = "photos"
+
+    id = Column(Integer, primary_key=True)
+    link = Column(String, nullable=False)
+
+    event_id = Column(Integer, ForeignKey('events.id'))
+    event = relationship("Event", back_populates="photos")
+
+
 class Event(Base):
     __tablename__ = "events"
 
@@ -225,6 +235,7 @@ class Event(Base):
     project_id = Column(Integer, ForeignKey("projects.id"), nullable=True)
     project = relationship("Project", back_populates="events")
 
+    photos = relationship("Photo",back_populates="event")
     organizers = relationship("OrganizerEvent", back_populates="event")
     volunteers = relationship("EventVolunteer", back_populates="event")
     partners = relationship("EventPartnerAssociation", back_populates="event")
