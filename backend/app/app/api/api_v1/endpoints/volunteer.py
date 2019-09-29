@@ -53,16 +53,7 @@ def form_step_0(
             return_data.update({field: getattr(user, field, None)})
         return_data["login_id"] = user.id
         del return_data["id"]
-        return {
-            "vk_id": user.vk_id,
-            "name": user.name,
-            "surname": user.surname,
-            "date_of_birth": user.date_of_birth,
-            "photo": user.photo,
-            "login_id": user.id,
-            "email": getattr(volunteer, "email", None),
-            "phone_number": getattr(volunteer, "phone_number", None)
-        }
+        return return_data
 
 
 @router.post("/patch", response_model=VolunteerFormResponse)
