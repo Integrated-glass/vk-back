@@ -1,8 +1,8 @@
 """photos
 
-Revision ID: 181e452b6458
+Revision ID: f3a6316ebf6e
 Revises: d3d33e32795b
-Create Date: 2019-09-29 02:14:19.899410
+Create Date: 2019-09-29 02:28:32.807353
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '181e452b6458'
+revision = 'f3a6316ebf6e'
 down_revision = 'd3d33e32795b'
 branch_labels = None
 depends_on = None
@@ -25,11 +25,11 @@ def upgrade():
     sa.ForeignKeyConstraint(['event_id'], ['events.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
-    op.add_column('events', sa.Column('location', sa.String(), nullable=False))
+    op.add_column('events', sa.Column('location', sa.String(), server_default='', nullable=False))
     op.alter_column('volunteers', 'volunteer_id',
                existing_type=sa.VARCHAR(),
                type_=sa.String(length=5),
-               nullable=False)
+               existing_nullable=True)
     # ### end Alembic commands ###
 
 
@@ -38,7 +38,7 @@ def downgrade():
     op.alter_column('volunteers', 'volunteer_id',
                existing_type=sa.String(length=5),
                type_=sa.VARCHAR(),
-               nullable=True)
+               existing_nullable=True)
     op.drop_column('events', 'location')
     op.drop_table('photos')
     # ### end Alembic commands ###
