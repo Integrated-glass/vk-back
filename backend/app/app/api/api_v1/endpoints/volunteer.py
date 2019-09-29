@@ -20,7 +20,7 @@ from app.models.models import VolunteerForm, VolunteerFormResponse, \
 router = APIRouter()
 
 
-@router.post("/login", response_model=VolunteerFormResponse)
+@router.post("/login")
 def form_step_0(
         *,
         db: Session = Depends(get_db),
@@ -46,13 +46,17 @@ def form_step_0(
         return_data = {}
         if volunteer is not None:
             volunteer_data = jsonable_encoder(volunteer)
+            return_data.update({"interests": volunteer.interests})
             for field in volunteer_data:
                 return_data.update({field: getattr(volunteer, field, None)})
+
+
         user_data = jsonable_encoder(user)
         for field in user_data:
             return_data.update({field: getattr(user, field, None)})
         return_data["login_id"] = user.id
         del return_data["id"]
+        del return_data["volunteer"]
         return return_data
 
 
