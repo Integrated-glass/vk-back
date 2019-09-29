@@ -49,9 +49,15 @@ def update(db_session: Session, *, user: Volunteer, user_in: VolunteerPatch):
 def get_by_id(db_session: Session, volunteer_id: int) -> Volunteer:
     return db_session \
         .query(Volunteer) \
-        .filter(Volunteer.id == volunteer_id) \
+        .filter_by(id=volunteer_id) \
         .one_or_none()
 
+
+def get_by_volunteer_id(db_session: Session, volunteer_id: int) -> Volunteer:
+    return db_session \
+        .query(Volunteer) \
+        .filter_by(volunteer_id=volunteer_id) \
+        .one_or_none()
 
 
 def apply(db_session: Session, application: EventApplication, volunteer: Volunteer,
