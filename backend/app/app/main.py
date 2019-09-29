@@ -13,7 +13,7 @@ import logging
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 
-app = FastAPI(title=config.PROJECT_NAME)
+app = FastAPI(title=config.PROJECT_NAME, docs_url="/api/docs", redoc_url="/api/redoc")
 app.add_middleware(
     CORSMiddleware,
     allow_origins=['*'],
